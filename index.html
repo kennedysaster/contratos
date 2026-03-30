@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contrato de Locação Residencial</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f2447;--navy2:#1a3a6b;--gold:#c8973a;--gold2:#e8b84b;
+  --cream:#faf8f4;--white:#fff;--gray50:#f5f4f1;--gray100:#e8e5e0;
+  --gray300:#bdb9b2;--gray500:#7a756e;--gray700:#3a3530;
+  --red:#c0392b;--indigo:#3730a3;--green:#166534;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--gray700);min-height:100vh;
+  background-image:radial-gradient(ellipse at 15% 0%,rgba(200,151,58,.07) 0%,transparent 55%),
+  radial-gradient(ellipse at 85% 100%,rgba(15,36,71,.05) 0%,transparent 55%)}
+
+/* HEADER */
+.page-header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
+  padding:44px 24px 38px;text-align:center;position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(45deg,transparent,transparent 38px,rgba(200,151,58,.04) 38px,rgba(200,151,58,.04) 39px)}
+.page-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent,var(--gold),var(--gold2),var(--gold),transparent)}
+.header-icon{width:68px;height:68px;background:rgba(200,151,58,.15);border:1.5px solid rgba(200,151,58,.4);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:30px}
+.page-header h1{font-family:'Playfair Display',serif;color:#fff;font-size:clamp(20px,4vw,28px);
+  letter-spacing:-.3px;margin-bottom:8px}
+.page-header p{color:rgba(255,255,255,.55);font-size:13.5px;font-weight:300}
+.gold-bar{width:48px;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold2));
+  margin:14px auto;border-radius:2px}
+
+/* LAYOUT */
+.container{max-width:800px;margin:0 auto;padding:30px 14px 70px}
+
+/* CARD */
+.card{background:var(--white);border-radius:16px;border:1px solid rgba(15,36,71,.07);
+  box-shadow:0 1px 4px rgba(15,36,71,.07);padding:26px;margin-bottom:18px;transition:box-shadow .2s}
+.card:hover{box-shadow:0 4px 18px rgba(15,36,71,.1)}
+.card-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--navy);
+  display:flex;align-items:center;gap:10px;padding-bottom:14px;margin-bottom:20px;
+  border-bottom:1px solid var(--gray100)}
+.card-title .badge{width:32px;height:32px;background:linear-gradient(135deg,var(--navy),var(--navy2));
+  border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+
+/* PILLS */
+.pills{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.pill{padding:6px 16px;border-radius:50px;font-size:13px;font-weight:500;cursor:pointer;
+  border:1.5px solid var(--gray300);background:var(--white);color:var(--gray500);
+  transition:all .18s;line-height:1}
+.pill:hover{border-color:var(--navy);color:var(--navy)}
+.pill.active{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 2px 8px rgba(15,36,71,.25)}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:560px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+/* FIELDS */
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11.5px;font-weight:600;color:var(--gray500);text-transform:uppercase;letter-spacing:.6px}
+.field input,.field select,.field textarea{
+  border:1.5px solid var(--gray100);border-radius:9px;padding:10px 13px;font-size:13.5px;
+  font-family:'DM Sans',sans-serif;color:var(--gray700);background:var(--gray50);
+  transition:all .15s;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--navy);background:var(--white);box-shadow:0 0 0 3px rgba(15,36,71,.07)}
+.field textarea{resize:none;line-height:1.6}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a756e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+
+/* SPACER */
+.spacer{height:14px}
+.spacer-sm{height:10px}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]#im_uc{-moz-appearance:textfield}
+
+/* INFO BOX */
+.info-box{background:rgba(15,36,71,.04);border:1px solid rgba(15,36,71,.1);
+  border-radius:10px;padding:14px 16px}
+.info-box-row{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--gray700);margin-bottom:6px}
+.info-box-row:last-child{margin-bottom:0}
+.info-box-row b{color:var(--navy);font-weight:600}
+.info-tag{font-size:11.5px;font-weight:700;color:var(--navy);background:rgba(15,36,71,.08);
+  padding:2px 8px;border-radius:20px;flex-shrink:0;margin-top:1px}
+
+/* WITNESS BLOCK */
+.witness-block{background:var(--gray50);border:1px solid var(--gray100);border-radius:10px;padding:16px;margin-bottom:10px}
+.witness-block:last-child{margin-bottom:0}
+.witness-label{font-size:11.5px;font-weight:700;color:var(--gray500);text-transform:uppercase;
+  letter-spacing:.6px;margin-bottom:12px}
+
+/* ERROR */
+.error-box{background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;
+  padding:12px 16px;margin-bottom:16px;font-size:13px;color:#b91c1c;display:none}
+
+/* ACTION CARD */
+.action-card{background:var(--white);border-radius:16px;border:1px solid rgba(15,36,71,.07);
+  box-shadow:0 1px 4px rgba(15,36,71,.07);overflow:hidden;margin-bottom:18px}
+
+/* PREVIEW BUTTON */
+.btn-preview{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  width:100%;padding:22px;cursor:pointer;border:none;
+  background:linear-gradient(135deg,#92400e,#b45309,#d97706);
+  color:#fff;font-family:'Playfair Display',serif;font-size:18px;letter-spacing:.3px;
+  transition:all .2s;position:relative;overflow:hidden}
+.btn-preview::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.0),rgba(255,255,255,.08));opacity:0;transition:opacity .2s}
+.btn-preview:hover::before{opacity:1}
+.btn-preview:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(146,64,14,.35)}
+.btn-preview:active{transform:translateY(0)}
+.btn-preview:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn-preview .eye-icon{font-size:22px}
+.btn-preview .badge-cached{
+  font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;
+  background:rgba(255,255,255,.2);padding:3px 10px;border-radius:20px;letter-spacing:.3px}
+
+/* EXPORT ROW */
+.export-row{padding:20px 26px;border-top:1px solid var(--gray100);
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.export-hints{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;padding:0 26px 16px}
+.hint{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--gray500)}
+.hint-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:11px 22px;border-radius:10px;font-size:13.5px;font-weight:600;
+  font-family:'DM Sans',sans-serif;border:none;cursor:pointer;transition:all .18s}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-ghost{background:transparent;border:1.5px solid var(--gray300);color:var(--gray500)}
+.btn-ghost:hover:not(:disabled){border-color:var(--navy);color:var(--navy)}
+.btn-word{background:var(--indigo);color:#fff;box-shadow:0 2px 8px rgba(55,48,163,.25)}
+.btn-word:hover:not(:disabled){background:#312e81;transform:translateY(-1px);box-shadow:0 4px 14px rgba(55,48,163,.35)}
+.btn-pdf{background:var(--red);color:#fff;box-shadow:0 2px 8px rgba(192,57,43,.25)}
+.btn-pdf:hover:not(:disabled){background:#a93226;transform:translateY(-1px);box-shadow:0 4px 14px rgba(192,57,43,.35)}
+.btn:active:not(:disabled){transform:translateY(0)!important}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MODAL OVERLAY */
+.modal-overlay{position:fixed;inset:0;z-index:999;background:rgba(10,20,40,.65);
+  backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;
+  padding:24px 12px;overflow-y:auto}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:20px;box-shadow:0 24px 80px rgba(10,20,40,.35);
+  width:100%;max-width:780px;margin:auto;overflow:hidden;
+  animation:slideUp .3s cubic-bezier(.16,1,.3,1)}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+/* MODAL HEADER */
+.modal-header{background:linear-gradient(135deg,var(--navy),var(--navy2));
+  padding:22px 28px;display:flex;align-items:center;justify-content:space-between}
+.modal-header-info h2{font-family:'Playfair Display',serif;color:#fff;font-size:18px;margin-bottom:3px}
+.modal-header-info p{color:rgba(255,255,255,.5);font-size:12.5px;font-weight:300}
+.modal-close{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);
+  border:none;color:#fff;font-size:20px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0}
+.modal-close:hover{background:rgba(255,255,255,.22)}
+
+/* MODAL META */
+.modal-meta{background:rgba(15,36,71,.04);border-bottom:1px solid var(--gray100);
+  padding:10px 28px;display:flex;flex-wrap:wrap;gap:16px}
+.meta-item{font-size:12px;color:var(--navy);font-weight:500}
+.meta-item b{font-weight:700}
+
+/* MODAL BODY */
+.modal-body{padding:28px 32px;max-height:62vh;overflow-y:auto;line-height:1}
+.modal-body::-webkit-scrollbar{width:5px}
+.modal-body::-webkit-scrollbar-track{background:var(--gray50)}
+.modal-body::-webkit-scrollbar-thumb{background:var(--gray300);border-radius:4px}
+.contract-line{font-size:13.5px;color:var(--gray700);line-height:1.75;text-align:justify;margin-bottom:1px}
+.contract-clause{
+  font-family:'Playfair Display',serif;font-size:13.5px;
+  color:var(--navy);font-weight:700;margin-top:22px;margin-bottom:4px;
+  padding-bottom:4px;border-bottom:1px solid rgba(15,36,71,.12)}
+.contract-blank{height:10px}
+
+/* MODAL FOOTER */
+.modal-footer{border-top:1px solid var(--gray100);padding:16px 28px;
+  background:var(--gray50);display:flex;flex-wrap:wrap;gap:10px;
+  align-items:center;justify-content:space-between}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:9999;
+  background:var(--navy);color:#fff;padding:12px 20px;border-radius:10px;
+  font-size:13px;font-weight:500;box-shadow:0 8px 28px rgba(15,36,71,.3);
+  transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.16,1,.3,1);pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:var(--green)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <div class="header-icon">📄</div>
+  <h1>Contrato de Locação Residencial</h1>
+  <div class="gold-bar"></div>
+  <p>Preencha os dados, visualize a prévia e exporte em Word ou PDF</p>
+</div>
+
+<div class="container">
+
+  <!-- ERROR -->
+  <div class="error-box" id="errorBox"></div>
+
+  <!-- 1. LOCADOR -->
+  <div class="card">
+    <div class="card-title"><div class="badge">👤</div> Dados do Locador</div>
+    <div class="pills">
+      <div class="pill active" onclick="setPill(this,'tipoLocador','padrao');toggleLocador()">Padrão</div>
+      <div class="pill" onclick="setPill(this,'tipoLocador','outro');toggleLocador()">Outro</div>
+    </div>
+    <div id="locadorPadraoSelect">
+      <div class="field" style="margin-bottom:16px">
+        <label>Selecionar locador padrão</label>
+        <select onchange="preencherLocadorPadrao(this.value)">
+          <option value="maria">Maria Clara de Oliveira Aquino</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Nome Completo *</label><input id="loc_nome" placeholder="Nome completo"></div>
+      <div class="field"><label>Nacionalidade *</label><input id="loc_nac" placeholder="Ex: Brasileiro(a)"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Estado Civil *</label>
+        <select id="loc_civil">
+          <option value="">Selecione...</option>
+          <option>Solteiro(a)</option><option>Casado(a)</option>
+          <option>Divorciado(a)</option><option>Viúvo(a)</option><option>União Estável</option>
+        </select>
+      </div>
+      <div class="field"><label>Profissão *</label><input id="loc_prof" placeholder="Profissão"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>RG *</label><input id="loc_rg" placeholder="Número do RG"></div>
+      <div class="field"><label>CPF *</label><input id="loc_cpf" placeholder="000.000.000-00"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Celular *</label><input id="loc_cel" placeholder="(00) 00000-0000"></div>
+      <div class="field"><label>E-mail *</label><input id="loc_email" type="email" placeholder="email@exemplo.com"></div>
+    </div>
+  </div>
+
+  <!-- 2. LOCATÁRIO -->
+  <div class="card">
+    <div class="card-title"><div class="badge">👥</div> Dados do Locatário</div>
+    <div class="grid-2">
+      <div class="field"><label>Nome Completo *</label><input id="loca_nome" placeholder="Nome completo"></div>
+      <div class="field"><label>Nacionalidade *</label><input id="loca_nac" placeholder="Ex: Brasileiro(a)"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Estado Civil *</label>
+        <select id="loca_civil">
+          <option value="">Selecione...</option>
+          <option>Solteiro(a)</option><option>Casado(a)</option>
+          <option>Divorciado(a)</option><option>Viúvo(a)</option><option>União Estável</option>
+        </select>
+      </div>
+      <div class="field"><label>Profissão *</label><input id="loca_prof" placeholder="Profissão"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>RG *</label><input id="loca_rg" placeholder="Número do RG"></div>
+      <div class="field"><label>CPF *</label><input id="loca_cpf" placeholder="000.000.000-00"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Celular *</label><input id="loca_cel" placeholder="(00) 00000-0000"></div>
+      <div class="field"><label>E-mail *</label><input id="loca_email" type="email" placeholder="email@exemplo.com"></div>
+    </div>
+  </div>
+
+  <!-- 3. IMÓVEL -->
+  <div class="card">
+    <div class="card-title"><div class="badge">🏠</div> Dados do Imóvel</div>
+    <div class="pills">
+      <div class="pill active" onclick="setPill(this,'tipoImovel','imovel1');preencherImovelPadrao('imovel1')">Imóvel 1</div>
+      <div class="pill" onclick="setPill(this,'tipoImovel','outro');limparImovel()">Outro Imóvel</div>
+    </div>
+    <div class="field"><label>Endereço Completo *</label>
+      <input id="im_end" placeholder="Rua, número, bairro, cidade - UF"></div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Número do Apartamento *</label><input id="im_apto" placeholder="Ex: Apto 101"></div>
+      <div class="field"><label>Cartório de Registro *</label><input id="im_cart" placeholder="Nome do cartório"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="field"><label>Descrição do Imóvel</label>
+      <textarea id="im_desc" rows="3" placeholder="Descreva o imóvel (opcional)"></textarea></div>
+    <div class="spacer-sm"></div>
+    <div class="field"><label>Unidade Consumidora Energia</label>
+      <input id="im_uc" type="number" min="0" step="1" placeholder="Ex: 10017184612" style="appearance:textfield;-moz-appearance:textfield">
+    </div>
+  </div>
+
+  <!-- 4. CONTRATO -->
+  <div class="card">
+    <div class="card-title"><div class="badge">📋</div> Dados do Contrato</div>
+    <div class="grid-2">
+      <div class="field"><label>Data de Início *</label><input id="ct_inicio" type="date"></div>
+      <div class="field"><label>Duração (meses) *</label><input id="ct_dur" type="number" min="1" placeholder="Ex: 12"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Valor do Aluguel (R$) *</label><input id="ct_aluguel" placeholder="0,00"></div>
+      <div class="field"><label>Dia do Vencimento *</label><input id="ct_dia" type="number" min="1" max="31" placeholder="Ex: 10"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="field"><label>Forma de Pagamento do Aluguel *</label>
+      <select id="ct_pag_alug">
+        <option value="">Selecione...</option>
+        <option>PIX</option><option>Transferência Bancária</option>
+        <option>Boleto Bancário</option><option>Depósito em Conta</option>
+      </select>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Valor do Caução (R$) *</label><input id="ct_caucao" placeholder="0,00"></div>
+      <div class="field"><label>Forma de Pagamento do Caução *</label>
+        <select id="ct_pag_cau">
+          <option value="">Selecione...</option>
+          <option>PIX</option><option>Transferência Bancária</option>
+          <option>Boleto Bancário</option><option>Depósito em Conta</option><option>Parcelado 3x</option>
+        </select>
+      </div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Índice de Reajuste *</label>
+        <select id="ct_indice">
+          <option value="">Selecione...</option>
+          <option>IGPM</option><option>IPCA</option><option>INPC</option><option>Outros índices</option>
+        </select>
+      </div>
+      <div class="field"><label>Especifique o índice</label>
+        <input id="ct_indice_esp" placeholder="Ex: IGPM/FGV"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="field"><label>Data de Assinatura do Contrato *</label>
+      <input id="ct_assin" type="date"></div>
+  </div>
+
+  <!-- 5. TESTEMUNHAS -->
+  <div class="card">
+    <div class="card-title"><div class="badge">✍️</div> Testemunhas</div>
+    <div class="pills">
+      <div class="pill" onclick="setPill(this,'tipoTest','sem');toggleTest()">Sem Testemunhas</div>
+      <div class="pill active" onclick="setPill(this,'tipoTest','padrao');toggleTest()">Testemunhas Padrão</div>
+      <div class="pill" onclick="setPill(this,'tipoTest','outras');toggleTest()">Outras Testemunhas</div>
+    </div>
+
+    <!-- Padrão -->
+    <div id="testPadraoBox">
+      <div class="info-box">
+        <p style="font-size:11.5px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Incluídas automaticamente</p>
+        <div class="info-box-row">
+          <span class="info-tag">T1</span>
+          <span><b>Marcos Kennedy de Sá e Souza</b> — CPF: 715.963.721-68 | RG: 4217149 - DGPC</span>
+        </div>
+        <div class="info-box-row">
+          <span class="info-tag">T2</span>
+          <span><b>GILMAR TOMAZ DE AQUINO</b> — CPF: 521.723.921-20 | RG: 2086442 - SSP-GO</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Outras -->
+    <div id="testOutrasBox" style="display:none">
+      <div class="witness-block">
+        <div class="witness-label">Testemunha 1</div>
+        <div class="grid-3">
+          <div class="field"><label>Nome Completo</label><input id="t1_nome"></div>
+          <div class="field"><label>CPF</label><input id="t1_cpf"></div>
+          <div class="field"><label>RG</label><input id="t1_rg"></div>
+        </div>
+      </div>
+      <div class="witness-block">
+        <div class="witness-label">Testemunha 2</div>
+        <div class="grid-3">
+          <div class="field"><label>Nome Completo</label><input id="t2_nome"></div>
+          <div class="field"><label>CPF</label><input id="t2_cpf"></div>
+          <div class="field"><label>RG</label><input id="t2_rg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTION CARD -->
+  <div class="action-card">
+    <!-- PRÉVIA BUTTON -->
+    <button class="btn-preview" id="btnPrevia" onclick="abrirPrevia()">
+      <span class="eye-icon">👁️</span>
+      <span>PRÉVIA DO CONTRATO</span>
+      <span class="badge-cached" id="cachedBadge" style="display:none">✓ já gerado</span>
+    </button>
+
+    <!-- EXPORT ROW -->
+    <div class="export-row">
+      <button class="btn btn-ghost" onclick="limpar()">🔄 Limpar Formulário</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-word" id="btnWord" onclick="gerarDoc()">
+          <span>📝</span><span>Gerar Word (.doc)</span>
+        </button>
+        <button class="btn btn-pdf" id="btnPdf" onclick="gerarPDF()">
+          <span>📄</span><span>Gerar PDF</span>
+        </button>
+      </div>
+    </div>
+    <div class="export-hints">
+      <div class="hint"><div class="hint-dot" style="background:var(--indigo)"></div>Word: editável no Word, Google Docs e LibreOffice</div>
+      <div class="hint"><div class="hint-dot" style="background:var(--red)"></div>PDF: formatado, pronto para imprimir e assinar</div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- MODAL PRÉVIA -->
+<div class="modal-overlay" id="modalOverlay" onclick="fecharModalFora(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <h2>Prévia do Contrato</h2>
+        <p>Revise o conteúdo antes de exportar</p>
+      </div>
+      <button class="modal-close" onclick="fecharModal()">×</button>
+    </div>
+    <div class="modal-meta" id="modalMeta"></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost" onclick="fecharModal()">✕ Fechar</button>
+        <button class="btn btn-ghost" onclick="regerarContrato()" style="border-color:#d97706;color:#92400e">🔄 Regerar</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-word" onclick="fecharModal();gerarDoc()">📝 Baixar Word</button>
+        <button class="btn btn-pdf" onclick="fecharModal();gerarPDF()">📄 Baixar PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+const state = { tipoLocador:'padrao', tipoImovel:'imovel1', tipoTest:'padrao' };
+let cachedText = '';
+let busy = false;
+
+// ── PILLS ──────────────────────────────────────────────────────────────────
+function setPill(el, key, val) {
+  state[key] = val;
+  el.closest('.pills').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function toggleLocador() {
+  const isPadrao = state.tipoLocador === 'padrao';
+  document.getElementById('locadorPadraoSelect').style.display = isPadrao ? '' : 'none';
+  if (isPadrao) preencherLocadorPadrao('maria');
+  else { ['loc_nome','loc_nac','loc_rg','loc_cpf','loc_cel','loc_email','loc_prof'].forEach(id => { const el = document.getElementById(id); if (el.tagName === 'INPUT') el.value = ''; }); document.getElementById('loc_civil').value = ''; }
+}
+
+function toggleTest() {
+  document.getElementById('testPadraoBox').style.display = state.tipoTest === 'padrao' ? '' : 'none';
+  document.getElementById('testOutrasBox').style.display = state.tipoTest === 'outras' ? '' : 'none';
+}
+
+// ── LOCADOR PADRÃO ─────────────────────────────────────────────────────────
+function preencherLocadorPadrao(val) {
+  if (val === 'maria') {
+    document.getElementById('loc_nome').value = 'MARIA CLARA DE OLIVEIRA AQUINO';
+    document.getElementById('loc_nac').value = 'Brasileira';
+    document.getElementById('loc_civil').value = 'Solteiro(a)';
+    document.getElementById('loc_prof').value = 'Veterinária';
+    document.getElementById('loc_rg').value = '5159899';
+    document.getElementById('loc_cpf').value = '024.447.511-32';
+    document.getElementById('loc_cel').value = '+55 (62) 99697-0480';
+    document.getElementById('loc_email').value = 'adm.ateliedosanjos@gmail.com';
+  }
+}
+preencherLocadorPadrao('maria');
+preencherImovelPadrao('imovel1');
+
+// ── IMÓVEL PADRÃO ──────────────────────────────────────────────────────────
+function preencherImovelPadrao(val) {
+  if (val === 'imovel1') {
+    document.getElementById('im_end').value = 'Rua Apuca, Qd 38, Lote 3, S/N, Condomínio Residencial Portal dos Sonhos, Bairro Capuava, CEP 74.450-230, Goiânia/GO';
+    document.getElementById('im_apto').value = '';
+    document.getElementById('im_cart').value = 'Outros';
+    document.getElementById('im_desc').value = '';
+    document.getElementById('im_uc').value = '';
+  }
+}
+
+function limparImovel() {
+  ['im_end','im_apto','im_cart','im_desc'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.tagName === 'TEXTAREA' ? el.value = '' : el.value = ''; }
+  });
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────────
+function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+
+function fmtDate(str) {
+  if (!str) return '___/___/______';
+  const d = new Date(str + 'T12:00:00');
+  return d.toLocaleDateString('pt-BR');
+}
+
+function calcTermino() {
+  const ini = v('ct_inicio'); const dur = v('ct_dur');
+  if (!ini || !dur) return '___/___/______';
+  const d = new Date(ini + 'T12:00:00');
+  d.setMonth(d.getMonth() + parseInt(dur));
+  return d.toLocaleDateString('pt-BR');
+}
+
+function getTestemunhas() {
+  if (state.tipoTest === 'sem') return 'Sem testemunhas.';
+  if (state.tipoTest === 'padrao') return 'Testemunha 1: Marcos Kennedy de Sá e Souza | CPF: 715.963.721-68 | RG: 4217149 - DGPC\nTestemunha 2: GILMAR TOMAZ DE AQUINO | CPF: 521.723.921-20 | RG: 2086442 - SSP-GO';
+  const t1 = [v('t1_nome'), v('t1_cpf'), v('t1_rg')];
+  const t2 = [v('t2_nome'), v('t2_cpf'), v('t2_rg')];
+  return `Testemunha 1: ${t1[0]} | CPF: ${t1[1]} | RG: ${t1[2]}\nTestemunha 2: ${t2[0]} | CPF: ${t2[1]} | RG: ${t2[2]}`;
+}
+
+function buildPrompt() {
+  return `Gere um contrato de locação residencial formal e completo em português brasileiro, juridicamente válido no Brasil. Use os dados abaixo. Formate os títulos das cláusulas em MAIÚSCULAS (ex: CLÁUSULA 1ª - DO OBJETO). Use apenas texto simples com quebras de linha, sem markdown.
+
+LOCADOR:
+Nome: ${v('loc_nome')} | Nacionalidade: ${v('loc_nac')} | Estado Civil: ${v('loc_civil')}
+Profissão: ${v('loc_prof')} | RG: ${v('loc_rg')} | CPF: ${v('loc_cpf')}
+Celular: ${v('loc_cel')} | E-mail: ${v('loc_email')}
+
+LOCATÁRIO:
+Nome: ${v('loca_nome')} | Nacionalidade: ${v('loca_nac')} | Estado Civil: ${v('loca_civil')}
+Profissão: ${v('loca_prof')} | RG: ${v('loca_rg')} | CPF: ${v('loca_cpf')}
+Celular: ${v('loca_cel')} | E-mail: ${v('loca_email')}
+
+IMÓVEL:
+Endereço: ${v('im_end')} | Apartamento: ${v('im_apto')}
+Cartório: ${v('im_cart')} | Descrição: ${v('im_desc')}${v('im_uc') ? '\nUnidade Consumidora de Energia: ' + v('im_uc') : ''}
+
+CONTRATO:
+Data de Início: ${fmtDate(v('ct_inicio'))} | Data de Término: ${calcTermino()} | Duração: ${v('ct_dur')} meses
+Valor do Aluguel: R$ ${v('ct_aluguel')} | Dia de Vencimento: dia ${v('ct_dia')}
+Forma de Pagamento do Aluguel: ${v('ct_pag_alug')}
+Valor do Caução: R$ ${v('ct_caucao')} | Forma de Pagamento do Caução: ${v('ct_pag_cau')}
+Índice de Reajuste: ${v('ct_indice')}${v('ct_indice_esp') ? ' ('+v('ct_indice_esp')+')' : ''}
+Data de Assinatura: ${fmtDate(v('ct_assin'))}
+
+TESTEMUNHAS:
+${getTestemunhas()}
+
+Inclua cláusulas sobre: objeto da locação, prazo, valor e pagamento, reajuste, caução, obrigações do locador, obrigações do locatário, conservação do imóvel, benfeitorias, rescisão, multas, disposições gerais, foro competente (Goiânia-GO), e ao final espaço para assinaturas com linhas tracejadas para: LOCADOR, LOCATÁRIO e TESTEMUNHAS.`;
+}
+
+// ── API CALL ───────────────────────────────────────────────────────────────
+async function callAPI() {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4000,
+      messages: [{ role: 'user', content: buildPrompt() }]
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content.map(b => b.text || '').join('\n');
+}
+
+// ── UI LOCK ────────────────────────────────────────────────────────────────
+function setBusy(is, type) {
+  busy = is;
+  ['btnPrevia','btnWord','btnPdf'].forEach(id => document.getElementById(id).disabled = is);
+  const btnPrevia = document.getElementById('btnPrevia');
+  if (!is) {
+    btnPrevia.innerHTML = `<span class="eye-icon">👁️</span><span>PRÉVIA DO CONTRATO</span>${cachedText ? '<span class="badge-cached">✓ já gerado</span>' : ''}`;
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = msg; el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function hideError() { document.getElementById('errorBox').style.display = 'none'; }
+
+function showToast(msg, success = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show' + (success ? ' success' : '');
+  setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+
+// ── PRÉVIA ─────────────────────────────────────────────────────────────────
+async function abrirPrevia() {
+  if (busy) return;
+  hideError();
+
+  if (cachedText) { renderModal(cachedText); return; }
+
+  setBusy(true);
+  const btn = document.getElementById('btnPrevia');
+  btn.innerHTML = '<div class="spin"></div><span>Gerando prévia...</span>';
+
+  try {
+    cachedText = await callAPI();
+    renderModal(cachedText);
+  } catch(e) { showError('Erro ao gerar prévia: ' + e.message); }
+
+  setBusy(false);
+}
+
+function renderModal(texto) {
+  // Meta
+  const meta = document.getElementById('modalMeta');
+  const parts = [];
+  if (v('loc_nome')) parts.push(`📋 Locador: <b>${v('loc_nome')}</b>`);
+  if (v('loca_nome')) parts.push(`🏠 Locatário: <b>${v('loca_nome')}</b>`);
+  if (v('ct_aluguel')) parts.push(`💰 Aluguel: <b>R$ ${v('ct_aluguel')}</b>`);
+  if (v('ct_dur')) parts.push(`📅 Duração: <b>${v('ct_dur')} meses</b>`);
+  meta.innerHTML = parts.map(p => `<div class="meta-item">${p}</div>`).join('');
+
+  // Body
+  const body = document.getElementById('modalBody');
+  const isClause = (l) => /^(CLÁUSULA|CONTRATO DE|DO OBJETO|DO PRAZO|DO VALOR|DO REAJUSTE|DA CAUÇÃO|DAS OBRIGAÇÕES|DA RESCISÃO|DAS DISPOSIÇÕES|DO FORO|ASSINATURA|TESTEMUNHA|LOCADOR|LOCATÁRIO)/i.test(l);
+  body.innerHTML = texto.split('\n').map(raw => {
+    const line = raw.trim();
+    if (!line) return '<div class="contract-blank"></div>';
+    if (isClause(line)) return `<div class="contract-clause">${line}</div>`;
+    return `<div class="contract-line">${line}</div>`;
+  }).join('');
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function fecharModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  setBusy(false);
+}
+
+function fecharModalFora(e) {
+  if (e.target === document.getElementById('modalOverlay')) fecharModal();
+}
+
+function regerarContrato() {
+  cachedText = '';
+  document.getElementById('cachedBadge').style.display = 'none';
+  fecharModal();
+  abrirPrevia();
+}
+
+// ── WORD ───────────────────────────────────────────────────────────────────
+async function gerarDoc() {
+  if (busy) return;
+  hideError(); setBusy(true, 'doc');
+  const btn = document.getElementById('btnWord');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<div class="spin"></div><span>Gerando...</span>';
+
+  try {
+    const texto = cachedText || await callAPI();
+    if (!cachedText) cachedText = texto;
+
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>body{font-family:Arial,sans-serif;font-size:12pt;line-height:1.8;margin:2.5cm;color:#111;}
+p{text-align:justify;margin:3pt 0;}</style></head><body>
+${texto.split('\n').map(l => {
+  const t = l.trim();
+  if (!t) return '<p>&nbsp;</p>';
+  if (/^(CLÁUSULA|CONTRATO DE|ASSINATURA|TESTEMUNHA)/i.test(t)) return `<p><b>${t}</b></p>`;
+  return `<p>${t}</p>`;
+}).join('\n')}</body></html>`;
+
+    const blob = new Blob([html], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `Contrato_${(v('loca_nome')||'Locatario').replace(/\s+/g,'_')}.doc`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    showToast('Word gerado com sucesso!', true);
+  } catch(e) { showError('Erro ao gerar Word: ' + e.message); }
+
+  btn.innerHTML = orig; setBusy(false);
+}
+
+// ── PDF ────────────────────────────────────────────────────────────────────
+async function gerarPDF() {
+  if (busy) return;
+  hideError(); setBusy(true, 'pdf');
+  const btn = document.getElementById('btnPdf');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<div class="spin"></div><span>Gerando...</span>';
+
+  try {
+    const texto = cachedText || await callAPI();
+    if (!cachedText) cachedText = texto;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const PW = doc.internal.pageSize.getWidth();
+    const PH = doc.internal.pageSize.getHeight();
+    const MX = 20, MY = 26, CW = PW - MX * 2;
+    const LH = 5.5, LHT = 7;
+
+    const drawHeader = () => {
+      doc.setFillColor(15, 36, 71);
+      doc.rect(0, 0, PW, 16, 'F');
+      // gold line
+      doc.setDrawColor(200, 151, 58); doc.setLineWidth(0.8);
+      doc.line(0, 16, PW, 16);
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+      doc.text('CONTRATO DE LOCAÇÃO RESIDENCIAL', PW / 2, 8.5, { align: 'center' });
+      const sub = `${v('loc_nome') || 'Locador'} › ${v('loca_nome') || 'Locatário'}`;
+      doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+      doc.text(sub, PW / 2, 13.5, { align: 'center' });
+      doc.setTextColor(30, 30, 30); doc.setLineWidth(0.2);
+    };
+
+    const drawFooter = (n, total) => {
+      doc.setDrawColor(220, 216, 210); doc.setLineWidth(0.3);
+      doc.line(MX, PH - 11, PW - MX, PH - 11);
+      doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(160, 155, 148);
+      doc.text(`Página ${n} de ${total}`, PW / 2, PH - 6, { align: 'center' });
+      doc.text(new Date().toLocaleDateString('pt-BR'), MX, PH - 6);
+      doc.text('Goiânia - GO', PW - MX, PH - 6, { align: 'right' });
+    };
+
+    const isClause = (l) => /^(CLÁUSULA|CONTRATO DE|DO OBJETO|DO PRAZO|DO VALOR|DO REAJUSTE|DA CAUÇÃO|DAS OBRIGAÇÕES|DA RESCISÃO|DAS DISPOSIÇÕES|DO FORO|ASSINATURA|TESTEMUNHA)/i.test(l);
+
+    drawHeader();
+    let y = MY;
+
+    const checkPage = (need) => {
+      if (y + need > PH - 14) { doc.addPage(); drawHeader(); y = MY; }
+    };
+
+    for (const raw of texto.split('\n')) {
+      const line = raw.trim();
+      if (!line) { y += 2; checkPage(2); continue; }
+
+      if (isClause(line)) {
+        y += 4; checkPage(LHT + 4);
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(15, 36, 71);
+        for (const wl of doc.splitTextToSize(line, CW)) {
+          checkPage(LHT); doc.text(wl, MX, y); y += LHT;
+        }
+        doc.setDrawColor(180, 200, 235); doc.setLineWidth(0.3);
+        doc.line(MX, y + 0.5, MX + CW, y + 0.5); y += 3;
+      } else {
+        checkPage(LH);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(35, 32, 28);
+        for (const wl of doc.splitTextToSize(line, CW)) {
+          checkPage(LH); doc.text(wl, MX, y); y += LH;
+        }
+      }
+    }
+
+    const total = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= total; i++) { doc.setPage(i); drawFooter(i, total); }
+    doc.save(`Contrato_${(v('loca_nome')||'Locatario').replace(/\s+/g,'_')}.pdf`);
+    showToast('PDF gerado com sucesso!', true);
+  } catch(e) { showError('Erro ao gerar PDF: ' + e.message); }
+
+  btn.innerHTML = orig; setBusy(false);
+}
+
+// ── LIMPAR ─────────────────────────────────────────────────────────────────
+function limpar() {
+  document.querySelectorAll('input').forEach(el => el.value = '');
+  document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+  document.querySelectorAll('textarea').forEach(el => el.value = '');
+  cachedText = '';
+  hideError();
+  // Reset pills
+  document.querySelectorAll('.pills').forEach(g => {
+    g.querySelectorAll('.pill').forEach((p,i) => p.classList.toggle('active', i === 0));
+  });
+  // Reset pill states
+  state.tipoLocador = 'padrao'; state.tipoImovel = 'imovel1'; state.tipoTest = 'padrao';
+  document.getElementById('locadorPadraoSelect').style.display = '';
+  document.getElementById('testPadraoBox').style.display = '';
+  document.getElementById('testOutrasBox').style.display = 'none';
+  preencherLocadorPadrao('maria');
+  preencherImovelPadrao('imovel1');
+  // Fix testemunha pills
+  const testPills = document.querySelector('#testPadraoBox').closest('.card').querySelector('.pills');
+  testPills.querySelectorAll('.pill').forEach((p,i) => p.classList.toggle('active', i === 1));
+  showToast('Formulário limpo!');
+}
+
+// ── KEYBOARD ──────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); });
+</script>
+</body>
+</html>
