@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contrato de Locação Residencial</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -159,497 +160,676 @@ input[type=number]#im_uc{-moz-appearance:textfield}
 .modal-header-info h2{font-family:'Playfair Display',serif;color:#fff;font-size:18px;margin-bottom:3px}
 .modal-header-info p{color:rgba(255,255,255,.5);font-size:12.5px;font-weight:300}
 .modal-close{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);
-  border:none;color:#fff;font-size:20px;line-height:1;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0}
-.modal-close:hover{background:rgba(255,255,255,.22)}
-
-/* MODAL META */
-.modal-meta{background:rgba(15,36,71,.04);border-bottom:1px solid var(--gray100);
-  padding:10px 28px;display:flex;flex-wrap:wrap;gap:16px}
-.meta-item{font-size:12px;color:var(--navy);font-weight:500}
-.meta-item b{font-weight:700}
+  border:none;color:#fff;font-size:20px;line-height:1;cursor:pointer;transition:all .18s}
+.modal-close:hover{background:rgba(255,255,255,.2)}
 
 /* MODAL BODY */
-.modal-body{padding:28px 32px;max-height:62vh;overflow-y:auto;line-height:1}
-.modal-body::-webkit-scrollbar{width:5px}
-.modal-body::-webkit-scrollbar-track{background:var(--gray50)}
-.modal-body::-webkit-scrollbar-thumb{background:var(--gray300);border-radius:4px}
-.contract-line{font-size:13.5px;color:var(--gray700);line-height:1.75;text-align:justify;margin-bottom:1px}
-.contract-clause{
-  font-family:'Playfair Display',serif;font-size:13.5px;
-  color:var(--navy);font-weight:700;margin-top:22px;margin-bottom:4px;
-  padding-bottom:4px;border-bottom:1px solid rgba(15,36,71,.12)}
-.contract-blank{height:10px}
+.modal-body{padding:28px;max-height:70vh;overflow-y:auto}
+.modal-body p{line-height:1.8;text-align:justify;margin-bottom:12px;font-size:13.5px;color:var(--gray700)}
+.modal-body p:first-letter{margin-left:24px}
+.preview-title{font-family:'Playfair Display',serif;color:var(--navy);font-size:16px;font-weight:700;
+  margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--gold)}
 
 /* MODAL FOOTER */
-.modal-footer{border-top:1px solid var(--gray100);padding:16px 28px;
-  background:var(--gray50);display:flex;flex-wrap:wrap;gap:10px;
-  align-items:center;justify-content:space-between}
+.modal-footer{padding:16px 28px;background:var(--gray50);border-top:1px solid var(--gray100);
+  display:flex;gap:10px;justify-content:flex-end}
 
 /* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;z-index:9999;
-  background:var(--navy);color:#fff;padding:12px 20px;border-radius:10px;
-  font-size:13px;font-weight:500;box-shadow:0 8px 28px rgba(15,36,71,.3);
-  transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.16,1,.3,1);pointer-events:none}
-.toast.show{transform:translateY(0);opacity:1}
-.toast.success{background:var(--green)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--green);
+  color:#fff;padding:14px 24px;border-radius:10px;font-size:13.5px;font-weight:500;
+  box-shadow:0 6px 24px rgba(22,101,52,.35);z-index:1000;animation:slideUp .3s ease}
+.toast.error{background:var(--red)}
+.toast.info{background:var(--navy)}
+
+/* PRINT */
+@media print {
+  .page-header, .container, .action-card, .export-row, .btn { display:none!important }
+  .modal-body { max-height:none; overflow:visible }
+}
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <div class="page-header">
-  <div class="header-icon">📄</div>
-  <h1>Contrato de Locação Residencial</h1>
+  <div class="header-icon">📋</div>
+  <h1>Contrato Residencial</h1>
+  <p>Gerador inteligente de contratos de locação</p>
   <div class="gold-bar"></div>
-  <p>Preencha os dados, visualize a prévia e exporte em Word ou PDF</p>
 </div>
 
 <div class="container">
 
-  <!-- ERROR -->
-  <div class="error-box" id="errorBox"></div>
+<!-- LOCADOR -->
+<div class="card">
+  <div class="card-title">
+    <div class="badge">👤</div>
+    <span>Dados do Locador</span>
+  </div>
+  
+  <div style="margin-bottom:14px">
+    <label style="font-size:11px;font-weight:600;color:var(--gray500);display:block;margin-bottom:10px">TIPO DE LOCADOR</label>
+    <div class="pills" id="locadorPills">
+      <button class="pill active" onclick="mudarTipoLocador('padrao')">Padrão</button>
+      <button class="pill" onclick="mudarTipoLocador('outras')">Outras</button>
+    </div>
+  </div>
 
-  <!-- 1. LOCADOR -->
-  <div class="card">
-    <div class="card-title"><div class="badge">👤</div> Dados do Locador</div>
+  <div id="locadorPadraoSelect" class="field" style="margin-bottom:14px">
+    <label>Selecione um locador</label>
+    <select onchange="preencherLocadorPadrao(this.value)">
+      <option value="maria">Maria Silva</option>
+      <option value="jose">José Santos</option>
+      <option value="ana">Ana Costa</option>
+    </select>
+  </div>
+
+  <div class="grid-2" id="locadorOutrasBox" style="display:none">
+    <div class="field">
+      <label>Nome completo</label>
+      <input type="text" id="loc_nome" placeholder="Ex: João Silva">
+    </div>
+    <div class="field">
+      <label>CPF/CNPJ</label>
+      <input type="text" id="loc_cpf" placeholder="000.000.000-00">
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label>E-mail</label>
+      <input type="email" id="loc_email" placeholder="locador@email.com">
+    </div>
+    <div class="field">
+      <label>Telefone</label>
+      <input type="tel" id="loc_tel" placeholder="(XX) XXXXX-XXXX">
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label>Endereço residencial</label>
+      <input type="text" id="loc_end" placeholder="Rua/Av. ...">
+    </div>
+    <div class="field">
+      <label>Número</label>
+      <input type="text" id="loc_num" placeholder="123">
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label>Complemento</label>
+      <input type="text" id="loc_comp" placeholder="Apto 101">
+    </div>
+    <div class="field">
+      <label>Bairro</label>
+      <input type="text" id="loc_bai" placeholder="Centro">
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label>Cidade</label>
+      <input type="text" id="loc_cid" placeholder="Goiânia">
+    </div>
+    <div class="field">
+      <label>Estado</label>
+      <input type="text" id="loc_est" placeholder="GO" maxlength="2">
+    </div>
+  </div>
+</div>
+
+<!-- LOCATÁRIO -->
+<div class="card">
+  <div class="card-title">
+    <div class="badge">👥</div>
+    <span>Dados do Locatário</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label>Nome completo</label>
+      <input type="text" id="loca_nome" placeholder="Ex: Maria Santos">
+    </div>
+    <div class="field">
+      <label>CPF</label>
+      <input type="text" id="loca_cpf" placeholder="000.000.000-00">
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label>E-mail</label>
+      <input type="email" id="loca_email" placeholder="locatario@email.com">
+    </div>
+    <div class="field">
+      <label>Telefone</label>
+      <input type="tel" id="loca_tel" placeholder="(XX) XXXXX-XXXX">
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label>Endereço residencial</label>
+      <input type="text" id="loca_end" placeholder="Rua/Av. ...">
+    </div>
+    <div class="field">
+      <label>Número</label>
+      <input type="text" id="loca_num" placeholder="123">
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label>Complemento</label>
+      <input type="text" id="loca_comp" placeholder="Apto 101">
+    </div>
+    <div class="field">
+      <label>Bairro</label>
+      <input type="text" id="loca_bai" placeholder="Centro">
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label>Cidade</label>
+      <input type="text" id="loca_cid" placeholder="Goiânia">
+    </div>
+    <div class="field">
+      <label>Estado</label>
+      <input type="text" id="loca_est" placeholder="GO" maxlength="2">
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="field">
+    <label>Profissão</label>
+    <input type="text" id="loca_prof" placeholder="Ex: Engenheiro">
+  </div>
+</div>
+
+<!-- IMÓVEL -->
+<div class="card">
+  <div class="card-title">
+    <div class="badge">🏠</div>
+    <span>Dados do Imóvel</span>
+  </div>
+
+  <div style="margin-bottom:14px">
+    <label style="font-size:11px;font-weight:600;color:var(--gray500);display:block;margin-bottom:10px">TIPO DE IMÓVEL</label>
     <div class="pills">
-      <div class="pill active" onclick="setPill(this,'tipoLocador','padrao');toggleLocador()">Padrão</div>
-      <div class="pill" onclick="setPill(this,'tipoLocador','outro');toggleLocador()">Outro</div>
-    </div>
-    <div id="locadorPadraoSelect">
-      <div class="field" style="margin-bottom:16px">
-        <label>Selecionar locador padrão</label>
-        <select onchange="preencherLocadorPadrao(this.value)">
-          <option value="maria">Maria Clara de Oliveira Aquino</option>
-        </select>
-      </div>
-    </div>
-    <div class="grid-2">
-      <div class="field"><label>Nome Completo *</label><input id="loc_nome" placeholder="Nome completo"></div>
-      <div class="field"><label>Nacionalidade *</label><input id="loc_nac" placeholder="Ex: Brasileiro(a)"></div>
-    </div>
-    <div class="spacer-sm"></div>
-    <div class="grid-2">
-      <div class="field"><label>Estado Civil *</label>
-        <select id="loc_civil">
-          <option value="">Selecione...</option>
-          <option>Solteiro(a)</option><option>Casado(a)</option>
-          <option>Divorciado(a)</option><option>Viúvo(a)</option><option>União Estável</option>
-        </select>
-      </div>
-      <div class="field"><label>Profissão *</label><input id="loc_prof" placeholder="Profissão"></div>
-    </div>
-    <div class="spacer-sm"></div>
-    <div class="grid-2">
-      <div class="field"><label>RG *</label><input id="loc_rg" placeholder="Número do RG"></div>
-      <div class="field"><label>CPF *</label><input id="loc_cpf" placeholder="000.000.000-00"></div>
-    </div>
-    <div class="spacer-sm"></div>
-    <div class="grid-2">
-      <div class="field"><label>Celular *</label><input id="loc_cel" placeholder="(00) 00000-0000"></div>
-      <div class="field"><label>E-mail *</label><input id="loc_email" type="email" placeholder="email@exemplo.com"></div>
+      <button class="pill active" onclick="mudarTipoImovel('imovel1')">Imóvel 1</button>
+      <button class="pill" onclick="mudarTipoImovel('imovel2')">Imóvel 2</button>
+      <button class="pill" onclick="mudarTipoImovel('outras')">Outras</button>
     </div>
   </div>
 
-  <!-- 2. LOCATÁRIO -->
-  <div class="card">
-    <div class="card-title"><div class="badge">👥</div> Dados do Locatário</div>
-    <div class="grid-2">
-      <div class="field"><label>Nome Completo *</label><input id="loca_nome" placeholder="Nome completo"></div>
-      <div class="field"><label>Nacionalidade *</label><input id="loca_nac" placeholder="Ex: Brasileiro(a)"></div>
-    </div>
-    <div class="spacer-sm"></div>
-    <div class="grid-2">
-      <div class="field"><label>Estado Civil *</label>
-        <select id="loca_civil">
-          <option value="">Selecione...</option>
-          <option>Solteiro(a)</option><option>Casado(a)</option>
-          <option>Divorciado(a)</option><option>Viúvo(a)</option><option>União Estável</option>
-        </select>
-      </div>
-      <div class="field"><label>Profissão *</label><input id="loca_prof" placeholder="Profissão"></div>
-    </div>
-    <div class="spacer-sm"></div>
-    <div class="grid-2">
-      <div class="field"><label>RG *</label><input id="loca_rg" placeholder="Número do RG"></div>
-      <div class="field"><label>CPF *</label><input id="loca_cpf" placeholder="000.000.000-00"></div>
-    </div>
-    <div class="spacer-sm"></div>
-    <div class="grid-2">
-      <div class="field"><label>Celular *</label><input id="loca_cel" placeholder="(00) 00000-0000"></div>
-      <div class="field"><label>E-mail *</label><input id="loca_email" type="email" placeholder="email@exemplo.com"></div>
-    </div>
-  </div>
-
-  <!-- 3. IMÓVEL -->
-  <div class="card">
-    <div class="card-title"><div class="badge">🏠</div> Dados do Imóvel</div>
-    <div class="pills">
-      <div class="pill active" onclick="setPill(this,'tipoImovel','imovel1');preencherImovelPadrao('imovel1')">Imóvel 1</div>
-      <div class="pill" onclick="setPill(this,'tipoImovel','outro');limparImovel()">Outro Imóvel</div>
-    </div>
-    <div class="field"><label>Endereço Completo *</label>
-      <input id="im_end" placeholder="Rua, número, bairro, cidade - UF"></div>
-    <div class="spacer-sm"></div>
-    <div class="grid-2">
-      <div class="field"><label>Número do Apartamento *</label><input id="im_apto" placeholder="Ex: Apto 101"></div>
-      <div class="field"><label>Cartório de Registro *</label><input id="im_cart" placeholder="Nome do cartório"></div>
-    </div>
-    <div class="spacer-sm"></div>
-    <div class="field"><label>Descrição do Imóvel</label>
-      <textarea id="im_desc" rows="3" placeholder="Descreva o imóvel (opcional)"></textarea></div>
-    <div class="spacer-sm"></div>
-    <div class="field"><label>Unidade Consumidora Energia</label>
-      <input id="im_uc" type="number" min="0" step="1" placeholder="Ex: 10017184612" style="appearance:textfield;-moz-appearance:textfield">
-    </div>
-  </div>
-
-  <!-- 4. CONTRATO -->
-  <div class="card">
-    <div class="card-title"><div class="badge">📋</div> Dados do Contrato</div>
-    <div class="grid-2">
-      <div class="field"><label>Data de Início *</label><input id="ct_inicio" type="date"></div>
-      <div class="field"><label>Duração (meses) *</label><input id="ct_dur" type="number" min="1" placeholder="Ex: 12"></div>
-    </div>
-    <div class="spacer-sm"></div>
-    <div class="grid-2">
-      <div class="field"><label>Valor do Aluguel (R$) *</label><input id="ct_aluguel" placeholder="0,00"></div>
-      <div class="field"><label>Dia do Vencimento *</label><input id="ct_dia" type="number" min="1" max="31" placeholder="Ex: 10"></div>
-    </div>
-    <div class="spacer-sm"></div>
-    <div class="field"><label>Forma de Pagamento do Aluguel *</label>
-      <select id="ct_pag_alug">
-        <option value="">Selecione...</option>
-        <option>PIX</option><option>Transferência Bancária</option>
-        <option>Boleto Bancário</option><option>Depósito em Conta</option>
-      </select>
-    </div>
-    <div class="spacer-sm"></div>
-    <div class="grid-2">
-      <div class="field"><label>Valor do Caução (R$) *</label><input id="ct_caucao" placeholder="0,00"></div>
-      <div class="field"><label>Forma de Pagamento do Caução *</label>
-        <select id="ct_pag_cau">
-          <option value="">Selecione...</option>
-          <option>PIX</option><option>Transferência Bancária</option>
-          <option>Boleto Bancário</option><option>Depósito em Conta</option><option>Parcelado 3x</option>
-        </select>
-      </div>
-    </div>
-    <div class="spacer-sm"></div>
-    <div class="grid-2">
-      <div class="field"><label>Índice de Reajuste *</label>
-        <select id="ct_indice">
-          <option value="">Selecione...</option>
-          <option>IGPM</option><option>IPCA</option><option>INPC</option><option>Outros índices</option>
-        </select>
-      </div>
-      <div class="field"><label>Especifique o índice</label>
-        <input id="ct_indice_esp" placeholder="Ex: IGPM/FGV"></div>
-    </div>
-    <div class="spacer-sm"></div>
-    <div class="field"><label>Data de Assinatura do Contrato *</label>
-      <input id="ct_assin" type="date"></div>
-  </div>
-
-  <!-- 5. TESTEMUNHAS -->
-  <div class="card">
-    <div class="card-title"><div class="badge">✍️</div> Testemunhas</div>
-    <div class="pills">
-      <div class="pill" onclick="setPill(this,'tipoTest','sem');toggleTest()">Sem Testemunhas</div>
-      <div class="pill active" onclick="setPill(this,'tipoTest','padrao');toggleTest()">Testemunhas Padrão</div>
-      <div class="pill" onclick="setPill(this,'tipoTest','outras');toggleTest()">Outras Testemunhas</div>
-    </div>
-
-    <!-- Padrão -->
-    <div id="testPadraoBox">
+  <div id="imoveisPreset">
+    <div id="imovel1Box">
       <div class="info-box">
-        <p style="font-size:11.5px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Incluídas automaticamente</p>
         <div class="info-box-row">
-          <span class="info-tag">T1</span>
-          <span><b>Marcos Kennedy de Sá e Souza</b> — CPF: 715.963.721-68 | RG: 4217149 - DGPC</span>
+          <b>Imóvel 1 (Exemplo):</b>
+          <span class="info-tag">Apto Residencial</span>
         </div>
-        <div class="info-box-row">
-          <span class="info-tag">T2</span>
-          <span><b>GILMAR TOMAZ DE AQUINO</b> — CPF: 521.723.921-20 | RG: 2086442 - SSP-GO</span>
-        </div>
+        <div class="info-box-row">Rua das Flores, 321, Apto 102, Setor Central - Goiânia, GO</div>
+        <div class="info-box-row"><b>Valor:</b> R$ 1.500,00/mês | <b>Caução:</b> R$ 4.500,00</div>
       </div>
     </div>
-
-    <!-- Outras -->
-    <div id="testOutrasBox" style="display:none">
-      <div class="witness-block">
-        <div class="witness-label">Testemunha 1</div>
-        <div class="grid-3">
-          <div class="field"><label>Nome Completo</label><input id="t1_nome"></div>
-          <div class="field"><label>CPF</label><input id="t1_cpf"></div>
-          <div class="field"><label>RG</label><input id="t1_rg"></div>
+    <div id="imovel2Box" style="display:none">
+      <div class="info-box">
+        <div class="info-box-row">
+          <b>Imóvel 2 (Exemplo):</b>
+          <span class="info-tag">Casa Residencial</span>
         </div>
-      </div>
-      <div class="witness-block">
-        <div class="witness-label">Testemunha 2</div>
-        <div class="grid-3">
-          <div class="field"><label>Nome Completo</label><input id="t2_nome"></div>
-          <div class="field"><label>CPF</label><input id="t2_cpf"></div>
-          <div class="field"><label>RG</label><input id="t2_rg"></div>
-        </div>
+        <div class="info-box-row">Avenida Principal, 789, Bairro Nobre - Goiânia, GO</div>
+        <div class="info-box-row"><b>Valor:</b> R$ 2.200,00/mês | <b>Caução:</b> R$ 6.600,00</div>
       </div>
     </div>
   </div>
 
-  <!-- ACTION CARD -->
-  <div class="action-card">
-    <!-- PRÉVIA BUTTON -->
-    <button class="btn-preview" id="btnPrevia" onclick="abrirPrevia()">
-      <span class="eye-icon">👁️</span>
-      <span>PRÉVIA DO CONTRATO</span>
-      <span class="badge-cached" id="cachedBadge" style="display:none">✓ já gerado</span>
-    </button>
-
-    <!-- EXPORT ROW -->
-    <div class="export-row">
-      <button class="btn btn-ghost" onclick="limpar()">🔄 Limpar Formulário</button>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-word" id="btnWord" onclick="gerarDoc()">
-          <span>📝</span><span>Gerar Word (.doc)</span>
-        </button>
-        <button class="btn btn-pdf" id="btnPdf" onclick="gerarPDF()">
-          <span>📄</span><span>Gerar PDF</span>
-        </button>
+  <div id="imoveisOutrasBox" style="display:none;margin-top:14px">
+    <div class="grid-2">
+      <div class="field">
+        <label>Endereço do imóvel</label>
+        <input type="text" id="im_end" placeholder="Rua/Av. ...">
+      </div>
+      <div class="field">
+        <label>Número</label>
+        <input type="text" id="im_num" placeholder="123">
       </div>
     </div>
-    <div class="export-hints">
-      <div class="hint"><div class="hint-dot" style="background:var(--indigo)"></div>Word: editável no Word, Google Docs e LibreOffice</div>
-      <div class="hint"><div class="hint-dot" style="background:var(--red)"></div>PDF: formatado, pronto para imprimir e assinar</div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label>Complemento</label>
+        <input type="text" id="im_comp" placeholder="Apto 101">
+      </div>
+      <div class="field">
+        <label>Bairro</label>
+        <input type="text" id="im_bai" placeholder="Centro">
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label>Cidade</label>
+        <input type="text" id="im_cid" placeholder="Goiânia">
+      </div>
+      <div class="field">
+        <label>Estado</label>
+        <input type="text" id="im_est" placeholder="GO" maxlength="2">
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label>Tipo de imóvel</label>
+        <select id="im_tipo">
+          <option>Apartamento</option>
+          <option>Casa</option>
+          <option>Sala comercial</option>
+          <option>Loja</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Metragem (m²)</label>
+        <input type="number" id="im_area" placeholder="120" min="0">
+      </div>
     </div>
   </div>
 
-</div><!-- /container -->
+  <div class="spacer"></div>
 
-<!-- MODAL PRÉVIA -->
+  <div class="grid-3">
+    <div class="field">
+      <label>Valor do aluguel (R$)</label>
+      <input type="number" id="im_valor" placeholder="1500" min="0" step="0.01">
+    </div>
+    <div class="field">
+      <label>Caução (R$) - 3x aluguel</label>
+      <input type="number" id="im_caucao" placeholder="4500" min="0" step="0.01">
+    </div>
+    <div class="field">
+      <label>IPTU anual (R$)</label>
+      <input type="number" id="im_iptu" placeholder="800" min="0" step="0.01">
+    </div>
+  </div>
+</div>
+
+<!-- CONTRATO -->
+<div class="card">
+  <div class="card-title">
+    <div class="badge">📅</div>
+    <span>Dados do Contrato</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label>Data de início</label>
+      <input type="date" id="ct_inicio">
+    </div>
+    <div class="field">
+      <label>Duração (meses)</label>
+      <input type="number" id="ct_duracao" placeholder="12" min="1" value="12">
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="field">
+    <label>Dia do vencimento</label>
+    <input type="number" id="ct_venc" placeholder="5" min="1" max="31" value="5">
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="field">
+    <label>Período de reajuste</label>
+    <select id="ct_reajuste">
+      <option value="anual">Anual</option>
+      <option value="semestral">Semestral</option>
+      <option value="nenhum">Nenhum</option>
+    </select>
+  </div>
+</div>
+
+<!-- TESTEMUNHAS -->
+<div class="card">
+  <div class="card-title">
+    <div class="badge">👨‍⚖️</div>
+    <span>Testemunhas</span>
+  </div>
+
+  <div style="margin-bottom:14px">
+    <label style="font-size:11px;font-weight:600;color:var(--gray500);display:block;margin-bottom:10px">TIPO DE TESTEMUNHA</label>
+    <div class="pills">
+      <button class="pill" onclick="mudarTipoTest('padrao')">Padrão</button>
+      <button class="pill active" onclick="mudarTipoTest('outras')">Outras</button>
+    </div>
+  </div>
+
+  <div id="testPadraoBox" style="display:none">
+    <div class="info-box">
+      <div class="info-box-row"><b>Test. 1:</b> Carlos Alberto Silva</div>
+      <div class="info-box-row"><b>Test. 2:</b> Fernanda Oliveira Costa</div>
+    </div>
+  </div>
+
+  <div id="testOutrasBox">
+    <div class="witness-block">
+      <div class="witness-label">Testemunha 1</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Nome</label>
+          <input type="text" id="test1_nome" placeholder="Nome completo">
+        </div>
+        <div class="field">
+          <label>CPF</label>
+          <input type="text" id="test1_cpf" placeholder="000.000.000-00">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Profissão</label>
+          <input type="text" id="test1_prof" placeholder="Ex: Advogado">
+        </div>
+        <div class="field">
+          <label>Telefone</label>
+          <input type="tel" id="test1_tel" placeholder="(XX) XXXXX-XXXX">
+        </div>
+      </div>
+    </div>
+
+    <div class="witness-block">
+      <div class="witness-label">Testemunha 2</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Nome</label>
+          <input type="text" id="test2_nome" placeholder="Nome completo">
+        </div>
+        <div class="field">
+          <label>CPF</label>
+          <input type="text" id="test2_cpf" placeholder="000.000.000-00">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Profissão</label>
+          <input type="text" id="test2_prof" placeholder="Ex: Advogado">
+        </div>
+        <div class="field">
+          <label>Telefone</label>
+          <input type="tel" id="test2_tel" placeholder="(XX) XXXXX-XXXX">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AÇÕES -->
+<div class="action-card">
+  <button class="btn-preview" onclick="abrirPrevia()">
+    <span class="eye-icon">👁️</span>
+    <span>Visualizar Prévia</span>
+    <span class="badge-cached" id="cachedBadge" style="display:none">Em cache</span>
+  </button>
+</div>
+
+<div class="action-card">
+  <div class="export-row">
+    <span style="font-size:12px;color:var(--gray500)">Exportar o contrato em:</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-word" id="btnWord" onclick="gerarDoc()">
+        <span style="font-size:18px">📄</span>
+        <span>Word</span>
+      </button>
+      <button class="btn btn-pdf" id="btnPdf" onclick="gerarPDF()">
+        <span style="font-size:18px">📕</span>
+        <span>PDF</span>
+      </button>
+    </div>
+  </div>
+  <div class="export-hints">
+    <div class="hint">
+      <div class="hint-dot" style="background:var(--gold)"></div>
+      <span>Teste a prévia antes de exportar</span>
+    </div>
+    <div class="hint">
+      <div class="hint-dot" style="background:var(--green)"></div>
+      <span>Verifique todos os dados</span>
+    </div>
+  </div>
+</div>
+
+<button class="btn btn-ghost" style="width:100%;margin-top:20px" onclick="limpar()">🔄 Limpar formulário</button>
+
+</div>
+
+<!-- ERROR BOX -->
+<div class="error-box" id="errorBox"></div>
+
+<!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="fecharModalFora(event)">
   <div class="modal">
     <div class="modal-header">
       <div class="modal-header-info">
         <h2>Prévia do Contrato</h2>
-        <p>Revise o conteúdo antes de exportar</p>
+        <p id="modalSubtitle">Contrato de Locação Residencial</p>
       </div>
-      <button class="modal-close" onclick="fecharModal()">×</button>
+      <button class="modal-close" onclick="fecharModal()">✕</button>
     </div>
-    <div class="modal-meta" id="modalMeta"></div>
-    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-body" id="previewContent"></div>
     <div class="modal-footer">
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-ghost" onclick="fecharModal()">✕ Fechar</button>
-        <button class="btn btn-ghost" onclick="regerarContrato()" style="border-color:#d97706;color:#92400e">🔄 Regerar</button>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-word" onclick="fecharModal();gerarDoc()">📝 Baixar Word</button>
-        <button class="btn btn-pdf" onclick="fecharModal();gerarPDF()">📄 Baixar PDF</button>
-      </div>
+      <button class="btn btn-ghost" onclick="regerarContrato()">🔄 Regenerar</button>
+      <button class="btn btn-word" onclick="gerarDoc()">📄 Word</button>
+      <button class="btn btn-pdf" onclick="gerarPDF()">📕 PDF</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 // ── STATE ──────────────────────────────────────────────────────────────────
-const state = { tipoLocador:'padrao', tipoImovel:'imovel1', tipoTest:'padrao' };
-let cachedText = '';
+let state = {
+  tipoLocador: 'padrao',
+  tipoImovel: 'imovel1',
+  tipoTest: 'outras'
+};
 let busy = false;
-
-// ── PILLS ──────────────────────────────────────────────────────────────────
-function setPill(el, key, val) {
-  state[key] = val;
-  el.closest('.pills').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-}
-
-function toggleLocador() {
-  const isPadrao = state.tipoLocador === 'padrao';
-  document.getElementById('locadorPadraoSelect').style.display = isPadrao ? '' : 'none';
-  if (isPadrao) preencherLocadorPadrao('maria');
-  else { ['loc_nome','loc_nac','loc_rg','loc_cpf','loc_cel','loc_email','loc_prof'].forEach(id => { const el = document.getElementById(id); if (el.tagName === 'INPUT') el.value = ''; }); document.getElementById('loc_civil').value = ''; }
-}
-
-function toggleTest() {
-  document.getElementById('testPadraoBox').style.display = state.tipoTest === 'padrao' ? '' : 'none';
-  document.getElementById('testOutrasBox').style.display = state.tipoTest === 'outras' ? '' : 'none';
-}
-
-// ── LOCADOR PADRÃO ─────────────────────────────────────────────────────────
-function preencherLocadorPadrao(val) {
-  if (val === 'maria') {
-    document.getElementById('loc_nome').value = 'MARIA CLARA DE OLIVEIRA AQUINO';
-    document.getElementById('loc_nac').value = 'Brasileira';
-    document.getElementById('loc_civil').value = 'Solteiro(a)';
-    document.getElementById('loc_prof').value = 'Veterinária';
-    document.getElementById('loc_rg').value = '5159899';
-    document.getElementById('loc_cpf').value = '024.447.511-32';
-    document.getElementById('loc_cel').value = '+55 (62) 99697-0480';
-    document.getElementById('loc_email').value = 'adm.ateliedosanjos@gmail.com';
-  }
-}
-preencherLocadorPadrao('maria');
-preencherImovelPadrao('imovel1');
-
-// ── IMÓVEL PADRÃO ──────────────────────────────────────────────────────────
-function preencherImovelPadrao(val) {
-  if (val === 'imovel1') {
-    document.getElementById('im_end').value = 'Rua Apuca, Qd 38, Lote 3, S/N, Condomínio Residencial Portal dos Sonhos, Bairro Capuava, CEP 74.450-230, Goiânia/GO';
-    document.getElementById('im_apto').value = '';
-    document.getElementById('im_cart').value = 'Outros';
-    document.getElementById('im_desc').value = '';
-    document.getElementById('im_uc').value = '';
-  }
-}
-
-function limparImovel() {
-  ['im_end','im_apto','im_cart','im_desc'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) { el.tagName === 'TEXTAREA' ? el.value = '' : el.value = ''; }
-  });
-}
+let cachedText = '';
 
 // ── HELPERS ────────────────────────────────────────────────────────────────
-function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+function v(id) { return document.getElementById(id)?.value || ''; }
+function setBusy(b, type) { busy = b; if (b) { document.body.style.cursor = 'wait'; } else { document.body.style.cursor = ''; } }
+function hideError() { document.getElementById('errorBox').style.display = 'none'; }
+function showError(msg) { const e = document.getElementById('errorBox'); e.innerText = msg; e.style.display = 'block'; }
+function showToast(msg, ok) { const t = document.createElement('div'); t.className = ok ? 'toast' : 'toast error'; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
 
-function fmtDate(str) {
-  if (!str) return '___/___/______';
-  const d = new Date(str + 'T12:00:00');
-  return d.toLocaleDateString('pt-BR');
+// ── LOCADOR ────────────────────────────────────────────────────────────────
+function mudarTipoLocador(tipo) {
+  state.tipoLocador = tipo;
+  document.querySelectorAll('#locadorPills .pill').forEach((p,i) => p.classList.toggle('active', (i === 0 && tipo === 'padrao') || (i === 1 && tipo === 'outras')));
+  document.getElementById('locadorPadraoSelect').style.display = tipo === 'padrao' ? '' : 'none';
+  document.getElementById('locadorOutrasBox').style.display = tipo === 'padrao' ? 'none' : '';
 }
 
-function calcTermino() {
-  const ini = v('ct_inicio'); const dur = v('ct_dur');
-  if (!ini || !dur) return '___/___/______';
-  const d = new Date(ini + 'T12:00:00');
-  d.setMonth(d.getMonth() + parseInt(dur));
-  return d.toLocaleDateString('pt-BR');
+function preencherLocadorPadrao(val) {
+  const locadores = {
+    maria: { nome: 'Maria Silva', cpf: '123.456.789-00', email: 'maria@email.com', tel: '(62) 99999-0001', end: 'Rua das Acácias', num: '456', comp: 'Apto 201', bai: 'Setor Central', cid: 'Goiânia', est: 'GO' },
+    jose: { nome: 'José Santos', cpf: '987.654.321-00', email: 'jose@email.com', tel: '(62) 99999-0002', end: 'Avenida Tocantins', num: '789', comp: 'Sala 305', bai: 'Centro', cid: 'Goiânia', est: 'GO' },
+    ana: { nome: 'Ana Costa', cpf: '456.789.123-00', email: 'ana@email.com', tel: '(62) 99999-0003', end: 'Rua São Paulo', num: '321', comp: 'Loja 1', bai: 'Vila Canaã', cid: 'Goiânia', est: 'GO' }
+  };
+  const d = locadores[val] || locadores.maria;
+  document.getElementById('loc_nome').value = d.nome;
+  document.getElementById('loc_cpf').value = d.cpf;
+  document.getElementById('loc_email').value = d.email;
+  document.getElementById('loc_tel').value = d.tel;
+  document.getElementById('loc_end').value = d.end;
+  document.getElementById('loc_num').value = d.num;
+  document.getElementById('loc_comp').value = d.comp;
+  document.getElementById('loc_bai').value = d.bai;
+  document.getElementById('loc_cid').value = d.cid;
+  document.getElementById('loc_est').value = d.est;
 }
 
-function getTestemunhas() {
-  if (state.tipoTest === 'sem') return 'Sem testemunhas.';
-  if (state.tipoTest === 'padrao') return 'Testemunha 1: Marcos Kennedy de Sá e Souza | CPF: 715.963.721-68 | RG: 4217149 - DGPC\nTestemunha 2: GILMAR TOMAZ DE AQUINO | CPF: 521.723.921-20 | RG: 2086442 - SSP-GO';
-  const t1 = [v('t1_nome'), v('t1_cpf'), v('t1_rg')];
-  const t2 = [v('t2_nome'), v('t2_cpf'), v('t2_rg')];
-  return `Testemunha 1: ${t1[0]} | CPF: ${t1[1]} | RG: ${t1[2]}\nTestemunha 2: ${t2[0]} | CPF: ${t2[1]} | RG: ${t2[2]}`;
-}
-
-function buildPrompt() {
-  return `Gere um contrato de locação residencial formal e completo em português brasileiro, juridicamente válido no Brasil. Use os dados abaixo. Formate os títulos das cláusulas em MAIÚSCULAS (ex: CLÁUSULA 1ª - DO OBJETO). Use apenas texto simples com quebras de linha, sem markdown.
-
-LOCADOR:
-Nome: ${v('loc_nome')} | Nacionalidade: ${v('loc_nac')} | Estado Civil: ${v('loc_civil')}
-Profissão: ${v('loc_prof')} | RG: ${v('loc_rg')} | CPF: ${v('loc_cpf')}
-Celular: ${v('loc_cel')} | E-mail: ${v('loc_email')}
-
-LOCATÁRIO:
-Nome: ${v('loca_nome')} | Nacionalidade: ${v('loca_nac')} | Estado Civil: ${v('loca_civil')}
-Profissão: ${v('loca_prof')} | RG: ${v('loca_rg')} | CPF: ${v('loca_cpf')}
-Celular: ${v('loca_cel')} | E-mail: ${v('loca_email')}
-
-IMÓVEL:
-Endereço: ${v('im_end')} | Apartamento: ${v('im_apto')}
-Cartório: ${v('im_cart')} | Descrição: ${v('im_desc')}${v('im_uc') ? '\nUnidade Consumidora de Energia: ' + v('im_uc') : ''}
-
-CONTRATO:
-Data de Início: ${fmtDate(v('ct_inicio'))} | Data de Término: ${calcTermino()} | Duração: ${v('ct_dur')} meses
-Valor do Aluguel: R$ ${v('ct_aluguel')} | Dia de Vencimento: dia ${v('ct_dia')}
-Forma de Pagamento do Aluguel: ${v('ct_pag_alug')}
-Valor do Caução: R$ ${v('ct_caucao')} | Forma de Pagamento do Caução: ${v('ct_pag_cau')}
-Índice de Reajuste: ${v('ct_indice')}${v('ct_indice_esp') ? ' ('+v('ct_indice_esp')+')' : ''}
-Data de Assinatura: ${fmtDate(v('ct_assin'))}
-
-TESTEMUNHAS:
-${getTestemunhas()}
-
-Inclua cláusulas sobre: objeto da locação, prazo, valor e pagamento, reajuste, caução, obrigações do locador, obrigações do locatário, conservação do imóvel, benfeitorias, rescisão, multas, disposições gerais, foro competente (Goiânia-GO), e ao final espaço para assinaturas com linhas tracejadas para: LOCADOR, LOCATÁRIO e TESTEMUNHAS.`;
-}
-
-// ── API CALL ───────────────────────────────────────────────────────────────
-async function callAPI() {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4000,
-      messages: [{ role: 'user', content: buildPrompt() }]
-    })
-  });
-  const data = await res.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.content.map(b => b.text || '').join('\n');
-}
-
-// ── UI LOCK ────────────────────────────────────────────────────────────────
-function setBusy(is, type) {
-  busy = is;
-  ['btnPrevia','btnWord','btnPdf'].forEach(id => document.getElementById(id).disabled = is);
-  const btnPrevia = document.getElementById('btnPrevia');
-  if (!is) {
-    btnPrevia.innerHTML = `<span class="eye-icon">👁️</span><span>PRÉVIA DO CONTRATO</span>${cachedText ? '<span class="badge-cached">✓ já gerado</span>' : ''}`;
+// ── IMÓVEL ─────────────────────────────────────────────────────────────────
+function mudarTipoImovel(tipo) {
+  state.tipoImovel = tipo;
+  document.querySelectorAll('.pills:has(+ #imoveisPreset) .pill').forEach((p,i) => p.classList.toggle('active', (i === 0 && tipo === 'imovel1') || (i === 1 && tipo === 'imovel2') || (i === 2 && tipo === 'outras')));
+  document.getElementById('imovel1Box').style.display = tipo === 'imovel1' ? '' : 'none';
+  document.getElementById('imovel2Box').style.display = tipo === 'imovel2' ? '' : 'none';
+  document.getElementById('imoveisOutrasBox').style.display = tipo === 'outras' ? '' : 'none';
+  
+  if (tipo === 'imovel1') {
+    document.getElementById('im_valor').value = '1500';
+    document.getElementById('im_caucao').value = '4500';
+    document.getElementById('im_iptu').value = '800';
+  } else if (tipo === 'imovel2') {
+    document.getElementById('im_valor').value = '2200';
+    document.getElementById('im_caucao').value = '6600';
+    document.getElementById('im_iptu').value = '1200';
   }
 }
 
-function showError(msg) {
-  const el = document.getElementById('errorBox');
-  el.textContent = msg; el.style.display = 'block';
-  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-function hideError() { document.getElementById('errorBox').style.display = 'none'; }
-
-function showToast(msg, success = false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast show' + (success ? ' success' : '');
-  setTimeout(() => { t.className = 'toast'; }, 3000);
+// ── TESTEMUNHA ─────────────────────────────────────────────────────────────
+function mudarTipoTest(tipo) {
+  state.tipoTest = tipo;
+  const pills = document.querySelectorAll('#testPadraoBox').length ? document.querySelector('.card:has(#testPadraoBox)').querySelector('.pills').querySelectorAll('.pill') : [];
+  if (pills.length) {
+    pills.forEach((p,i) => p.classList.toggle('active', (i === 0 && tipo === 'padrao') || (i === 1 && tipo === 'outras')));
+  }
+  document.getElementById('testPadraoBox').style.display = tipo === 'padrao' ? '' : 'none';
+  document.getElementById('testOutrasBox').style.display = tipo === 'padrao' ? 'none' : '';
 }
 
-// ── PRÉVIA ─────────────────────────────────────────────────────────────────
-async function abrirPrevia() {
+// ── GERADOR DE CONTRATO ────────────────────────────────────────────────────
+function gerarContrato() {
+  const loc_nome = v('loc_nome');
+  const loc_cpf = v('loc_cpf');
+  const loca_nome = v('loca_nome');
+  const loca_cpf = v('loca_cpf');
+  const loca_prof = v('loca_prof');
+  const im_end = state.tipoImovel !== 'outras' ? (state.tipoImovel === 'imovel1' ? 'Rua das Flores, 321, Apto 102, Setor Central' : 'Avenida Principal, 789, Bairro Nobre') : `${v('im_end')}, ${v('im_num')}${v('im_comp') ? ', ' + v('im_comp') : ''}, ${v('im_bai')}`;
+  const im_cid = state.tipoImovel !== 'outras' ? 'Goiânia' : v('im_cid');
+  const im_est = state.tipoImovel !== 'outras' ? 'GO' : v('im_est');
+  const im_valor = parseFloat(v('im_valor')) || 1500;
+  const im_caucao = parseFloat(v('im_caucao')) || 4500;
+  const ct_inicio = v('ct_inicio');
+  const ct_duracao = parseInt(v('ct_duracao')) || 12;
+  const ct_venc = parseInt(v('ct_venc')) || 5;
+  const ct_reajuste = v('ct_reajuste');
+
+  const dataInicio = ct_inicio ? new Date(ct_inicio).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
+  const dataFim = ct_inicio ? new Date(new Date(ct_inicio).setMonth(new Date(ct_inicio).getMonth() + ct_duracao)).toLocaleDateString('pt-BR') : 'data não informada';
+
+  const test1 = state.tipoTest === 'padrao' ? { nome: 'Carlos Alberto Silva', cpf: '111.222.333-44', prof: 'Advogado' } : { nome: v('test1_nome'), cpf: v('test1_cpf'), prof: v('test1_prof') };
+  const test2 = state.tipoTest === 'padrao' ? { nome: 'Fernanda Oliveira Costa', cpf: '555.666.777-88', prof: 'Corretora' } : { nome: v('test2_nome'), cpf: v('test2_cpf'), prof: v('test2_prof') };
+
+  return `CONTRATO DE LOCAÇÃO RESIDENCIAL
+
+Este contrato de locação residencial é celebrado entre:
+
+LOCADOR: ${loc_nome}, brasileiro(a), CPF ${loc_cpf}, doravante denominado "LOCADOR".
+
+LOCATÁRIO: ${loca_nome}, brasileiro(a), CPF ${loca_cpf}, profissão ${loca_prof}, doravante denominado "LOCATÁRIO".
+
+CLÁUSULA 1 - DO OBJETO
+
+O LOCADOR locará, e o LOCATÁRIO alugará, para fins exclusivamente residenciais, o imóvel localizado em ${im_end}, ${im_cid}, Estado de ${im_est}, nas condições estabelecidas neste contrato.
+
+CLÁUSULA 2 - DO PRAZO
+
+O prazo da locação é de ${ct_duracao} (${ct_duracao === 12 ? 'doze' : 'vários'}) meses, tendo início em ${dataInicio} e término em ${dataFim}.
+
+CLÁUSULA 3 - DO VALOR E FORMA DE PAGAMENTO
+
+O valor mensal do aluguel é de R$ ${im_valor.toFixed(2)}, com vencimento no dia ${ct_venc} de cada mês. O pagamento deverá ser feito através de transferência bancária ou em espécie, diretamente ao LOCADOR ou seu representante.
+
+CLÁUSULA 4 - DA CAUÇÃO
+
+O LOCATÁRIO depositará, como garantia, a quantia de R$ ${im_caucao.toFixed(2)}, equivalente a 03 (três) meses de aluguel, que será devolvida ao término do contrato, desde que o imóvel esteja em bom estado de conservação.
+
+CLÁUSULA 5 - DO REAJUSTE
+
+O aluguel será reajustado ${ct_reajuste === 'anual' ? 'anualmente' : ct_reajuste === 'semestral' ? 'semestralmente' : 'conforme acordado'}, de acordo com o índice que for indicado na renovação do contrato.
+
+CLÁUSULA 6 - DAS OBRIGAÇÕES DO LOCADOR
+
+O LOCADOR obriga-se a:
+- Entregar o imóvel em perfeito estado de conservação;
+- Manter a estrutura do imóvel;
+- Reparar defeitos estruturais que surgirem durante a locação.
+
+CLÁUSULA 7 - DAS OBRIGAÇÕES DO LOCATÁRIO
+
+O LOCATÁRIO obriga-se a:
+- Pagar pontualmente o aluguel e demais encargos;
+- Usar o imóvel exclusivamente para fins residenciais;
+- Conservar o imóvel em bom estado;
+- Pagar as despesas com água, energia e gás;
+- Não fazer reformas sem consentimento do LOCADOR;
+- Permitir visitas do LOCADOR para vistoria.
+
+CLÁUSULA 8 - DA RESCISÃO
+
+Este contrato poderá ser rescindido:
+- Pela expiração do prazo;
+- Por acordo entre as partes;
+- Pelo não pagamento do aluguel;
+- Pelo descumprimento das obrigações estabelecidas.
+
+CLÁUSULA 9 - DO FORO
+
+Fica eleito o foro da comarca de Goiânia para dirimir quaisquer dúvidas oriundas deste contrato.
+
+ASSINATURA
+
+Feito e firmado nesta data de ${new Date().toLocaleDateString('pt-BR')}, em Goiânia - GO.
+
+${loc_nome}
+Locador
+
+${loca_nome}
+Locatário
+
+TESTEMUNHA 1: ${test1.nome}, CPF ${test1.cpf}, profissão ${test1.prof}
+
+TESTEMUNHA 2: ${test2.nome}, CPF ${test2.cpf}, profissão ${test2.prof}`;
+}
+
+// ── MODAL ──────────────────────────────────────────────────────────────────
+function abrirPrevia() {
   if (busy) return;
   hideError();
-
-  if (cachedText) { renderModal(cachedText); return; }
-
   setBusy(true);
-  const btn = document.getElementById('btnPrevia');
-  btn.innerHTML = '<div class="spin"></div><span>Gerando prévia...</span>';
-
-  try {
-    cachedText = await callAPI();
-    renderModal(cachedText);
-  } catch(e) { showError('Erro ao gerar prévia: ' + e.message); }
-
-  setBusy(false);
-}
-
-function renderModal(texto) {
-  // Meta
-  const meta = document.getElementById('modalMeta');
-  const parts = [];
-  if (v('loc_nome')) parts.push(`📋 Locador: <b>${v('loc_nome')}</b>`);
-  if (v('loca_nome')) parts.push(`🏠 Locatário: <b>${v('loca_nome')}</b>`);
-  if (v('ct_aluguel')) parts.push(`💰 Aluguel: <b>R$ ${v('ct_aluguel')}</b>`);
-  if (v('ct_dur')) parts.push(`📅 Duração: <b>${v('ct_dur')} meses</b>`);
-  meta.innerHTML = parts.map(p => `<div class="meta-item">${p}</div>`).join('');
-
-  // Body
-  const body = document.getElementById('modalBody');
-  const isClause = (l) => /^(CLÁUSULA|CONTRATO DE|DO OBJETO|DO PRAZO|DO VALOR|DO REAJUSTE|DA CAUÇÃO|DAS OBRIGAÇÕES|DA RESCISÃO|DAS DISPOSIÇÕES|DO FORO|ASSINATURA|TESTEMUNHA|LOCADOR|LOCATÁRIO)/i.test(l);
-  body.innerHTML = texto.split('\n').map(raw => {
-    const line = raw.trim();
-    if (!line) return '<div class="contract-blank"></div>';
-    if (isClause(line)) return `<div class="contract-clause">${line}</div>`;
-    return `<div class="contract-line">${line}</div>`;
-  }).join('');
-
-  document.getElementById('modalOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  setTimeout(() => {
+    try {
+      const contrato = gerarContrato();
+      cachedText = contrato;
+      const html = contrato.split('\n').map(linha => {
+        const t = linha.trim();
+        if (!t) return '<p>&nbsp;</p>';
+        if (/^(CLÁUSULA|CONTRATO DE|ASSINATURA|TESTEMUNHA)/i.test(t)) return `<p style="font-weight:700;color:#0f2447;font-size:14px;margin-top:16px">${t}</p>`;
+        if (t.includes(':') && !t.includes('Para') && t.length < 100) return `<p style="font-weight:600;color:#1a3a6b;margin-top:8px">${t}</p>`;
+        return `<p>${t}</p>`;
+      }).join('');
+      document.getElementById('previewContent').innerHTML = html;
+      document.getElementById('modalOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('cachedBadge').style.display = '';
+      showToast('Prévia carregada!', true);
+    } catch(e) {
+      showError('Erro ao gerar prévia: ' + e.message);
+    }
+    setBusy(false);
+  }, 300);
 }
 
 function fecharModal() {
@@ -678,7 +858,7 @@ async function gerarDoc() {
   btn.innerHTML = '<div class="spin"></div><span>Gerando...</span>';
 
   try {
-    const texto = cachedText || await callAPI();
+    const texto = cachedText || gerarContrato();
     if (!cachedText) cachedText = texto;
 
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -687,7 +867,7 @@ p{text-align:justify;margin:3pt 0;}</style></head><body>
 ${texto.split('\n').map(l => {
   const t = l.trim();
   if (!t) return '<p>&nbsp;</p>';
-  if (/^(CLÁUSULA|CONTRATO DE|ASSINATURA|TESTEMUNHA)/i.test(t)) return `<p><b>${t}</b></p>`;
+  if (/^(CLÁUSULA|CONTRATO|ASSINATURA|TESTEMUNHA)/i.test(t)) return `<p><b>${t}</b></p>`;
   return `<p>${t}</p>`;
 }).join('\n')}</body></html>`;
 
@@ -703,7 +883,7 @@ ${texto.split('\n').map(l => {
 }
 
 // ── PDF ────────────────────────────────────────────────────────────────────
-async function gerarPDF() {
+function gerarPDF() {
   if (busy) return;
   hideError(); setBusy(true, 'pdf');
   const btn = document.getElementById('btnPdf');
@@ -711,75 +891,26 @@ async function gerarPDF() {
   btn.innerHTML = '<div class="spin"></div><span>Gerando...</span>';
 
   try {
-    const texto = cachedText || await callAPI();
-    if (!cachedText) cachedText = texto;
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const PW = doc.internal.pageSize.getWidth();
-    const PH = doc.internal.pageSize.getHeight();
-    const MX = 20, MY = 26, CW = PW - MX * 2;
-    const LH = 5.5, LHT = 7;
-
-    const drawHeader = () => {
-      doc.setFillColor(15, 36, 71);
-      doc.rect(0, 0, PW, 16, 'F');
-      // gold line
-      doc.setDrawColor(200, 151, 58); doc.setLineWidth(0.8);
-      doc.line(0, 16, PW, 16);
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(11); doc.setFont('helvetica', 'bold');
-      doc.text('CONTRATO DE LOCAÇÃO RESIDENCIAL', PW / 2, 8.5, { align: 'center' });
-      const sub = `${v('loc_nome') || 'Locador'} › ${v('loca_nome') || 'Locatário'}`;
-      doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-      doc.text(sub, PW / 2, 13.5, { align: 'center' });
-      doc.setTextColor(30, 30, 30); doc.setLineWidth(0.2);
-    };
-
-    const drawFooter = (n, total) => {
-      doc.setDrawColor(220, 216, 210); doc.setLineWidth(0.3);
-      doc.line(MX, PH - 11, PW - MX, PH - 11);
-      doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(160, 155, 148);
-      doc.text(`Página ${n} de ${total}`, PW / 2, PH - 6, { align: 'center' });
-      doc.text(new Date().toLocaleDateString('pt-BR'), MX, PH - 6);
-      doc.text('Goiânia - GO', PW - MX, PH - 6, { align: 'right' });
-    };
-
-    const isClause = (l) => /^(CLÁUSULA|CONTRATO DE|DO OBJETO|DO PRAZO|DO VALOR|DO REAJUSTE|DA CAUÇÃO|DAS OBRIGAÇÕES|DA RESCISÃO|DAS DISPOSIÇÕES|DO FORO|ASSINATURA|TESTEMUNHA)/i.test(l);
-
-    drawHeader();
-    let y = MY;
-
-    const checkPage = (need) => {
-      if (y + need > PH - 14) { doc.addPage(); drawHeader(); y = MY; }
-    };
-
-    for (const raw of texto.split('\n')) {
-      const line = raw.trim();
-      if (!line) { y += 2; checkPage(2); continue; }
-
-      if (isClause(line)) {
-        y += 4; checkPage(LHT + 4);
-        doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(15, 36, 71);
-        for (const wl of doc.splitTextToSize(line, CW)) {
-          checkPage(LHT); doc.text(wl, MX, y); y += LHT;
-        }
-        doc.setDrawColor(180, 200, 235); doc.setLineWidth(0.3);
-        doc.line(MX, y + 0.5, MX + CW, y + 0.5); y += 3;
-      } else {
-        checkPage(LH);
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(35, 32, 28);
-        for (const wl of doc.splitTextToSize(line, CW)) {
-          checkPage(LH); doc.text(wl, MX, y); y += LH;
-        }
-      }
+    const elemento = document.getElementById('previewContent');
+    if (!elemento || !elemento.innerText.trim()) {
+      showError('Gere a prévia primeiro antes de exportar para PDF');
+      btn.innerHTML = orig; setBusy(false);
+      return;
     }
 
-    const total = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= total; i++) { doc.setPage(i); drawFooter(i, total); }
-    doc.save(`Contrato_${(v('loca_nome')||'Locatario').replace(/\s+/g,'_')}.pdf`);
+    const opt = {
+      margin: 10,
+      filename: `Contrato_${(v('loca_nome')||'Locatario').replace(/\s+/g,'_')}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(elemento).save();
     showToast('PDF gerado com sucesso!', true);
-  } catch(e) { showError('Erro ao gerar PDF: ' + e.message); }
+  } catch(e) {
+    showError('Erro ao gerar PDF: ' + e.message);
+  }
 
   btn.innerHTML = orig; setBusy(false);
 }
@@ -788,27 +919,27 @@ async function gerarPDF() {
 function limpar() {
   document.querySelectorAll('input').forEach(el => el.value = '');
   document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
-  document.querySelectorAll('textarea').forEach(el => el.value = '');
   cachedText = '';
   hideError();
-  // Reset pills
-  document.querySelectorAll('.pills').forEach(g => {
-    g.querySelectorAll('.pill').forEach((p,i) => p.classList.toggle('active', i === 0));
-  });
-  // Reset pill states
-  state.tipoLocador = 'padrao'; state.tipoImovel = 'imovel1'; state.tipoTest = 'padrao';
-  document.getElementById('locadorPadraoSelect').style.display = '';
-  document.getElementById('testPadraoBox').style.display = '';
-  document.getElementById('testOutrasBox').style.display = 'none';
+  state.tipoLocador = 'padrao'; state.tipoImovel = 'imovel1'; state.tipoTest = 'outras';
+  mudarTipoLocador('padrao');
+  mudarTipoImovel('imovel1');
+  mudarTipoTest('outras');
   preencherLocadorPadrao('maria');
-  preencherImovelPadrao('imovel1');
-  // Fix testemunha pills
-  const testPills = document.querySelector('#testPadraoBox').closest('.card').querySelector('.pills');
-  testPills.querySelectorAll('.pill').forEach((p,i) => p.classList.toggle('active', i === 1));
+  document.getElementById('ct_duracao').value = '12';
+  document.getElementById('ct_venc').value = '5';
+  document.getElementById('ct_reajuste').value = 'anual';
   showToast('Formulário limpo!');
 }
 
-// ── KEYBOARD ──────────────────────────────────────────────────────────────
+// ── INICIALIZAR ────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  preencherLocadorPadrao('maria');
+  mudarTipoImovel('imovel1');
+  const hoje = new Date();
+  document.getElementById('ct_inicio').valueAsDate = hoje;
+});
+
 document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); });
 </script>
 </body>
