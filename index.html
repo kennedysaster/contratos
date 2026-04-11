@@ -299,7 +299,6 @@ input[type=number]#im_uc{-moz-appearance:textfield}
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 const state = { tipoLocador:'padrao', tipoImovel:'imovel1', tipoTest:'padrao' };
@@ -415,7 +414,7 @@ async function callAPI() {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 120000);
   try {
-    const res = await fetch('/.netlify/functions/generate-contract', {
+    const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt: buildPrompt() }),
