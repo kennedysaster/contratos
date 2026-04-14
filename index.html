@@ -415,17 +415,10 @@ async function callAPI() {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 120000);
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/.netlify/functions/generate', {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'x-api-key': 'sk-placeholder'
-      },
-      body: JSON.stringify({ 
-        model: 'claude-opus-4-20250514',
-        max_tokens: 4096,
-        messages: [{ role: 'user', content: buildPrompt() }]
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: buildPrompt() }),
       signal: controller.signal
     });
     clearTimeout(timeoutId);
@@ -435,8 +428,8 @@ async function callAPI() {
       throw new Error(errorMsg);
     }
     const data = await res.json();
-    if (!data.content || !data.content[0] || !data.content[0].text) throw new Error('Resposta vazia do servidor');
-    return data.content[0].text;
+    if (!data.text || !data.text.trim()) throw new Error('Resposta vazia do servidor');
+    return data.text;
   } catch(e) {
     clearTimeout(timeoutId);
     if (e.name === 'AbortError') throw new Error('Tempo limite excedido. Tente novamente.');
