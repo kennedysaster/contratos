@@ -1,0 +1,11 @@
+{
+  "name": "meuscontratos",
+  "version": "1.0.0",
+  "description": "Gerador de Contratos de Locação com PDF",
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "build": "echo 'Build realizado'"
+  }
+}

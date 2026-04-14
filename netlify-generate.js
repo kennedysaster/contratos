@@ -1,6 +1,4 @@
 // netlify/functions/generate.js
-const fetch = require('node-fetch');
-
 exports.handler = async (event, context) => {
   // Apenas POST
   if (event.httpMethod !== 'POST') {
