@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contrato de Locação Residencial</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
-<!-- Bibliotecas para geração de PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -102,7 +101,6 @@ input[type=number]#im_uc{-moz-appearance:textfield}
 .toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--navy);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 8px 28px rgba(15,36,71,.3);transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.16,1,.3,1);pointer-events:none}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.success{background:var(--green)}
-.contract-preview-pdf{display:none;position:absolute;left:-9999px;top:-9999px;width:800px;background:white;padding:40px;font-family:'Arial', sans-serif;font-size:11pt;line-height:1.6;color:#333}
 </style>
 </head>
 <body>
@@ -115,135 +113,165 @@ input[type=number]#im_uc{-moz-appearance:textfield}
 </div>
 
 <div class="container">
+
   <div class="error-box" id="errorBox"></div>
 
   <div class="card">
     <div class="card-title"><div class="badge">👤</div> Dados do Locador</div>
     <div class="pills">
-      <button class="pill active" onclick="selecionarTipoLocador('padrao')">Padrão</button>
-      <button class="pill" onclick="selecionarTipoLocador('outro')">Outro</button>
+      <div class="pill active" onclick="setPill(this,'tipoLocador','padrao');toggleLocador()">Padrão</div>
+      <div class="pill" onclick="setPill(this,'tipoLocador','outro');toggleLocador()">Outro</div>
     </div>
-
     <div id="locadorPadraoSelect">
-      <div class="field">
-        <label>Selecionar Locador Padrão</label>
+      <div class="field" style="margin-bottom:16px">
+        <label>Selecionar locador padrão</label>
         <select onchange="preencherLocadorPadrao(this.value)">
-          <option value="maria">Maria Silva - CPF: 123.456.789-00</option>
-          <option value="joao">João Santos - CPF: 987.654.321-00</option>
-          <option value="empresa">Empresa Ltda. - CNPJ: 12.345.678/0001-99</option>
+          <option value="maria">Maria Clara de Oliveira Aquino</option>
         </select>
       </div>
-      <div class="spacer"></div>
     </div>
+    <div class="grid-2">
+      <div class="field"><label>Nome Completo *</label><input id="loc_nome" placeholder="Nome completo"></div>
+      <div class="field"><label>Nacionalidade *</label><input id="loc_nac" placeholder="Ex: Brasileiro(a)"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Estado Civil *</label><select id="loc_civil"><option value="">Selecione...</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viúvo(a)</option><option>União Estável</option></select></div>
+      <div class="field"><label>Profissão *</label><input id="loc_prof" placeholder="Profissão"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>RG *</label><input id="loc_rg" placeholder="Número do RG"></div>
+      <div class="field"><label>CPF *</label><input id="loc_cpf" placeholder="000.000.000-00"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Celular *</label><input id="loc_cel" placeholder="(00) 00000-0000"></div>
+      <div class="field"><label>E-mail *</label><input id="loc_email" type="email" placeholder="email@exemplo.com"></div>
+    </div>
+  </div>
 
-    <div id="locadorOutroBox" style="display:none;">
-      <div class="grid-2">
-        <div class="field"><label>Nome/Razão Social</label><input type="text" id="loca_nome" placeholder="ex: João da Silva"></div>
-        <div class="field"><label>CPF/CNPJ</label><input type="text" id="loca_doc" placeholder="ex: 123.456.789-00"></div>
-      </div>
-      <div class="spacer"></div>
+  <div class="card">
+    <div class="card-title"><div class="badge">👥</div> Dados do Locatário</div>
+    <div class="grid-2">
+      <div class="field"><label>Nome Completo *</label><input id="loca_nome" placeholder="Nome completo"></div>
+      <div class="field"><label>Nacionalidade *</label><input id="loca_nac" placeholder="Ex: Brasileiro(a)"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Estado Civil *</label><select id="loca_civil"><option value="">Selecione...</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viúvo(a)</option><option>União Estável</option></select></div>
+      <div class="field"><label>Profissão *</label><input id="loca_prof" placeholder="Profissão"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>RG *</label><input id="loca_rg" placeholder="Número do RG"></div>
+      <div class="field"><label>CPF *</label><input id="loca_cpf" placeholder="000.000.000-00"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Celular *</label><input id="loca_cel" placeholder="(00) 00000-0000"></div>
+      <div class="field"><label>E-mail *</label><input id="loca_email" type="email" placeholder="email@exemplo.com"></div>
     </div>
   </div>
 
   <div class="card">
     <div class="card-title"><div class="badge">🏠</div> Dados do Imóvel</div>
     <div class="pills">
-      <button class="pill active" onclick="selecionarTipoImovel('imovel1')">Padrão</button>
-      <button class="pill" onclick="selecionarTipoImovel('outro')">Outro</button>
+      <div class="pill active" onclick="setPill(this,'tipoImovel','imovel1');preencherImovelPadrao('imovel1')">Imóvel 1</div>
+      <div class="pill" onclick="setPill(this,'tipoImovel','outro');limparImovel()">Outro Imóvel</div>
     </div>
-
-    <div id="imPadraoBox">
-      <div class="field">
-        <label>Selecionar Imóvel Padrão</label>
-        <select onchange="preencherImovelPadrao(this.value)">
-          <option value="imovel1">Apartamento - Rua A, 100 - São Paulo, SP</option>
-          <option value="imovel2">Casa - Rua B, 200 - Rio de Janeiro, RJ</option>
-          <option value="imovel3">Comercial - Av. C, 300 - Belo Horizonte, MG</option>
-        </select>
-      </div>
-      <div class="spacer"></div>
+    <div class="field"><label>Endereço Completo *</label><input id="im_end" placeholder="Rua, número, bairro, cidade - UF"></div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Número do Apartamento *</label><input id="im_apto" placeholder="Ex: Apto 101"></div>
+      <div class="field"><label>Cartório de Registro *</label><input id="im_cart" placeholder="Nome do cartório"></div>
     </div>
-
-    <div id="imOutroBox" style="display:none;">
-      <div class="field"><label>Endereço Completo</label><input type="text" id="im_end" placeholder="ex: Rua X, 123"></div>
-      <div class="grid-2">
-        <div class="field"><label>Cidade</label><input type="text" id="im_cidade" placeholder="ex: São Paulo"></div>
-        <div class="field"><label>Estado</label><input type="text" id="im_est" placeholder="ex: SP"></div>
-      </div>
-      <div class="field"><label>Descrição</label><textarea id="im_desc" placeholder="ex: Apartamento 2 quartos"></textarea></div>
-      <div class="spacer"></div>
-    </div>
+    <div class="spacer-sm"></div>
+    <div class="field"><label>Descrição do Imóvel</label><textarea id="im_desc" rows="3" placeholder="Descreva o imóvel (opcional)"></textarea></div>
+    <div class="spacer-sm"></div>
+    <div class="field"><label>Unidade Consumidora Energia</label><input id="im_uc" type="number" min="0" step="1" placeholder="Ex: 10017184612" style="appearance:textfield;-moz-appearance:textfield"></div>
   </div>
 
   <div class="card">
-    <div class="card-title"><div class="badge">💰</div> Dados Financeiros</div>
+    <div class="card-title"><div class="badge">📋</div> Dados do Contrato</div>
     <div class="grid-2">
-      <div class="field"><label>Aluguel Mensal (R$)</label><input type="number" id="fin_aluguel" placeholder="ex: 1500" min="0"></div>
-      <div class="field"><label>Caução (% do aluguel)</label><input type="number" id="fin_caucao" placeholder="ex: 100" min="0" max="300"></div>
+      <div class="field"><label>Data de Início *</label><input id="ct_inicio" type="date"></div>
+      <div class="field"><label>Duração (meses) *</label><input id="ct_dur" type="number" min="1" placeholder="Ex: 12"></div>
     </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Valor do Aluguel (R$) *</label><input id="ct_aluguel" placeholder="0,00"></div>
+      <div class="field"><label>Dia do Vencimento *</label><input id="ct_dia" type="number" min="1" max="31" placeholder="Ex: 10"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="field"><label>Forma de Pagamento do Aluguel *</label><select id="ct_pag_alug"><option value="">Selecione...</option><option>PIX</option><option>Transferência Bancária</option><option>Boleto Bancário</option><option>Depósito em Conta</option></select></div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Valor do Caução (R$) *</label><input id="ct_caucao" placeholder="0,00"></div>
+      <div class="field"><label>Forma de Pagamento do Caução *</label><select id="ct_pag_cau"><option value="">Selecione...</option><option>PIX</option><option>Transferência Bancária</option><option>Boleto Bancário</option><option>Depósito em Conta</option><option>Parcelado 3x</option></select></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="grid-2">
+      <div class="field"><label>Índice de Reajuste *</label><select id="ct_indice"><option value="">Selecione...</option><option>IGPM</option><option>IPCA</option><option>INPC</option><option>Outros índices</option></select></div>
+      <div class="field"><label>Especifique o índice</label><input id="ct_indice_esp" placeholder="Ex: IGPM/FGV"></div>
+    </div>
+    <div class="spacer-sm"></div>
+    <div class="field"><label>Data de Assinatura do Contrato *</label><input id="ct_assin" type="date"></div>
   </div>
 
   <div class="card">
-    <div class="card-title"><div class="badge">👥</div> Locatário</div>
-    <div class="grid-2">
-      <div class="field"><label>Nome</label><input type="text" id="loc_nome" placeholder="ex: Pedro Costa"></div>
-      <div class="field"><label>CPF</label><input type="text" id="loc_cpf" placeholder="ex: 111.222.333-44"></div>
-    </div>
-    <div class="spacer"></div>
-    <div class="grid-2">
-      <div class="field"><label>Profissão</label><input type="text" id="loc_prof" placeholder="ex: Engenheiro"></div>
-      <div class="field"><label>Telefone</label><input type="text" id="loc_tel" placeholder="ex: (11) 99999-9999"></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><div class="badge">📋</div> Testemunhas</div>
+    <div class="card-title"><div class="badge">✍️</div> Testemunhas</div>
     <div class="pills">
-      <button class="pill active" onclick="selecionarTipoTest('padrao')">Padrão</button>
-      <button class="pill" onclick="selecionarTipoTest('outras')">Outras</button>
+      <div class="pill" onclick="setPill(this,'tipoTest','sem');toggleTest()">Sem Testemunhas</div>
+      <div class="pill active" onclick="setPill(this,'tipoTest','padrao');toggleTest()">Testemunhas Padrão</div>
+      <div class="pill" onclick="setPill(this,'tipoTest','outras');toggleTest()">Outras Testemunhas</div>
     </div>
-
     <div id="testPadraoBox">
       <div class="info-box">
-        <div class="info-box-row"><b>1ª Testemunha:</b> Ana Silva | CPF: 555.666.777-88</div>
-        <div class="info-box-row"><b>2ª Testemunha:</b> Carlos Mendes | CPF: 999.888.777-66</div>
+        <p style="font-size:11.5px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Incluídas automaticamente</p>
+        <div class="info-box-row"><span class="info-tag">T1</span><span><b>Marcos Kennedy de Sá e Souza</b> — CPF: 715.963.721-68 | RG: 4217149 - DGPC</span></div>
+        <div class="info-box-row"><span class="info-tag">T2</span><span><b>GILMAR TOMAZ DE AQUINO</b> — CPF: 521.723.921-20 | RG: 2086442 - SSP-GO</span></div>
       </div>
-      <div class="spacer"></div>
     </div>
-
-    <div id="testOutrasBox" style="display:none;">
+    <div id="testOutrasBox" style="display:none">
       <div class="witness-block">
-        <div class="witness-label">1ª Testemunha</div>
-        <div class="grid-2">
-          <div class="field"><label>Nome</label><input type="text" id="test1_nome" placeholder="ex: Ana Silva"></div>
-          <div class="field"><label>CPF</label><input type="text" id="test1_cpf" placeholder="ex: 555.666.777-88"></div>
+        <div class="witness-label">Testemunha 1</div>
+        <div class="grid-3">
+          <div class="field"><label>Nome Completo</label><input id="t1_nome"></div>
+          <div class="field"><label>CPF</label><input id="t1_cpf"></div>
+          <div class="field"><label>RG</label><input id="t1_rg"></div>
         </div>
       </div>
       <div class="witness-block">
-        <div class="witness-label">2ª Testemunha</div>
-        <div class="grid-2">
-          <div class="field"><label>Nome</label><input type="text" id="test2_nome" placeholder="ex: Carlos Mendes"></div>
-          <div class="field"><label>CPF</label><input type="text" id="test2_cpf" placeholder="ex: 999.888.777-66"></div>
+        <div class="witness-label">Testemunha 2</div>
+        <div class="grid-3">
+          <div class="field"><label>Nome Completo</label><input id="t2_nome"></div>
+          <div class="field"><label>CPF</label><input id="t2_cpf"></div>
+          <div class="field"><label>RG</label><input id="t2_rg"></div>
         </div>
       </div>
-      <div class="spacer"></div>
     </div>
   </div>
 
   <div class="action-card">
-    <button class="btn-preview" onclick="abrirPrevia()"><span class="eye-icon">👁️</span> Visualizar Contrato <span class="badge-cached" id="cachedBadge" style="display:none">CACHEADO</span></button>
+    <button class="btn-preview" id="btnPrevia" onclick="abrirPrevia()">
+      <span class="eye-icon">👁️</span>
+      <span>PRÉVIA DO CONTRATO</span>
+      <span class="badge-cached" id="cachedBadge" style="display:none">✓ já gerado</span>
+    </button>
     <div class="export-row">
-      <div>
-        <button class="btn btn-word" id="btnWord" onclick="gerarDoc()">📄 Word</button>
-        <button class="btn btn-pdf" id="btnPdf" onclick="gerarPDF()">📕 PDF</button>
+      <button class="btn btn-ghost" onclick="limpar()">🔄 Limpar Formulário</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-word" id="btnWord" onclick="gerarDoc()"><span>📝</span><span>Gerar Word (.doc)</span></button>
+        <button class="btn btn-pdf" id="btnPdf" onclick="gerarPDF()"><span>📄</span><span>Gerar PDF</span></button>
       </div>
-      <button class="btn btn-ghost" onclick="limpar()">🔄 Limpar</button>
     </div>
     <div class="export-hints">
-      <div class="hint"><div class="hint-dot" style="background:var(--indigo)"></div> Word (.doc) para edição</div>
-      <div class="hint"><div class="hint-dot" style="background:var(--red)"></div> PDF para impressão</div>
+      <div class="hint"><div class="hint-dot" style="background:var(--indigo)"></div>Word: editável no Word, Google Docs e LibreOffice</div>
+      <div class="hint"><div class="hint-dot" style="background:var(--red)"></div>PDF: formatado, pronto para imprimir e assinar</div>
     </div>
   </div>
+
 </div>
 
 <div class="modal-overlay" id="modalOverlay" onclick="fecharModalFora(event)">
@@ -251,203 +279,231 @@ input[type=number]#im_uc{-moz-appearance:textfield}
     <div class="modal-header">
       <div class="modal-header-info">
         <h2>Prévia do Contrato</h2>
-        <p>Revise antes de exportar</p>
+        <p>Revise o conteúdo antes de exportar</p>
       </div>
-      <button class="modal-close" onclick="fecharModal()">✕</button>
+      <button class="modal-close" onclick="fecharModal()">×</button>
     </div>
-    <div class="modal-meta">
-      <div class="meta-item">Locador: <b id="previewLocador">-</b></div>
-      <div class="meta-item">Imóvel: <b id="previewImovel">-</b></div>
-      <div class="meta-item">Aluguel: <b>R$ <span id="previewAluguel">-</span></b></div>
-    </div>
+    <div class="modal-meta" id="modalMeta"></div>
     <div class="modal-body" id="modalBody"></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="regerarContrato()">Editar</button>
-      <div style="flex:1"></div>
-      <button class="btn btn-word" id="btnWord2" onclick="gerarDoc()">📄 Word</button>
-      <button class="btn btn-pdf" id="btnPdf2" onclick="gerarPDF()">📕 PDF</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost" onclick="fecharModal()">✕ Fechar</button>
+        <button class="btn btn-ghost" onclick="regerarContrato()" style="border-color:#d97706;color:#92400e">🔄 Regerar</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-word" onclick="fecharModal();gerarDoc()">📝 Baixar Word</button>
+        <button class="btn btn-pdf" onclick="fecharModal();gerarPDF()">📄 Baixar PDF</button>
+      </div>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="contract-preview-pdf" id="contractPreviewPdf"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
-// Estados da aplicação
-const state = {
-  tipoLocador: 'padrao',
-  tipoImovel: 'imovel1',
-  tipoTest: 'padrao'
-};
-
+const state = { tipoLocador:'padrao', tipoImovel:'imovel1', tipoTest:'padrao' };
 let cachedText = '';
 let busy = false;
 
-// Funções utilitárias
-function v(id) { return document.getElementById(id)?.value || ''; }
-function setBusy(b, type) { busy = b; if (type === 'doc') document.getElementById('btnWord').disabled = b; if (type === 'pdf') document.getElementById('btnPdf').disabled = b; }
-function showError(msg) { const box = document.getElementById('errorBox'); box.textContent = msg; box.style.display = 'block'; }
-function hideError() { document.getElementById('errorBox').style.display = 'none'; }
-function showToast(msg, success) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); t.classList.toggle('success', success); setTimeout(() => t.classList.remove('show'), 3000); }
+function setPill(el, key, val) {
+  state[key] = val;
+  el.closest('.pills').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
 
-// Seleção de tipo de locador
-function selecionarTipoLocador(tipo) {
-  state.tipoLocador = tipo;
-  document.querySelectorAll('#locadorPadraoSelect, #locadorOutroBox').forEach(el => el.style.display = 'none');
-  if (tipo === 'padrao') {
-    document.getElementById('locadorPadraoSelect').style.display = '';
-    preencherLocadorPadrao('maria');
-  } else {
-    document.getElementById('locadorOutroBox').style.display = '';
+function toggleLocador() {
+  const isPadrao = state.tipoLocador === 'padrao';
+  document.getElementById('locadorPadraoSelect').style.display = isPadrao ? '' : 'none';
+  if (isPadrao) preencherLocadorPadrao('maria');
+  else { ['loc_nome','loc_nac','loc_rg','loc_cpf','loc_cel','loc_email','loc_prof'].forEach(id => { const el = document.getElementById(id); if (el.tagName === 'INPUT') el.value = ''; }); document.getElementById('loc_civil').value = ''; }
+}
+
+function toggleTest() {
+  document.getElementById('testPadraoBox').style.display = state.tipoTest === 'padrao' ? '' : 'none';
+  document.getElementById('testOutrasBox').style.display = state.tipoTest === 'outras' ? '' : 'none';
+}
+
+function preencherLocadorPadrao(val) {
+  if (val === 'maria') {
+    document.getElementById('loc_nome').value = 'MARIA CLARA DE OLIVEIRA AQUINO';
+    document.getElementById('loc_nac').value = 'Brasileira';
+    document.getElementById('loc_civil').value = 'Solteiro(a)';
+    document.getElementById('loc_prof').value = 'Veterinária';
+    document.getElementById('loc_rg').value = '5159899';
+    document.getElementById('loc_cpf').value = '024.447.511-32';
+    document.getElementById('loc_cel').value = '+55 (62) 99697-0480';
+    document.getElementById('loc_email').value = 'adm.ateliedosanjos@gmail.com';
+  }
+}
+preencherLocadorPadrao('maria');
+preencherImovelPadrao('imovel1');
+
+function preencherImovelPadrao(val) {
+  if (val === 'imovel1') {
+    document.getElementById('im_end').value = 'Rua Apuca, Qd 38, Lote 3, S/N, Condomínio Residencial Portal dos Sonhos, Bairro Capuava, CEP 74.450-230, Goiânia/GO';
+    document.getElementById('im_apto').value = '';
+    document.getElementById('im_cart').value = 'Outros';
+    document.getElementById('im_desc').value = '';
+    document.getElementById('im_uc').value = '';
   }
 }
 
-function preencherLocadorPadrao(opt) {
-  const dados = {
-    maria: { nome: 'Maria Silva', doc: '123.456.789-00' },
-    joao: { nome: 'João Santos', doc: '987.654.321-00' },
-    empresa: { nome: 'Empresa Ltda.', doc: '12.345.678/0001-99' }
-  };
-  if (dados[opt]) {
-    document.getElementById('loca_nome').value = dados[opt].nome;
-    document.getElementById('loca_doc').value = dados[opt].doc;
-  }
+function limparImovel() {
+  ['im_end','im_apto','im_cart','im_desc'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.tagName === 'TEXTAREA' ? el.value = '' : el.value = ''; }
+  });
 }
 
-// Seleção de tipo de imóvel
-function selecionarTipoImovel(tipo) {
-  state.tipoImovel = tipo;
-  document.querySelectorAll('#imPadraoBox, #imOutroBox').forEach(el => el.style.display = 'none');
-  if (tipo === 'imovel1') {
-    document.getElementById('imPadraoBox').style.display = '';
-    preencherImovelPadrao('imovel1');
-  } else {
-    document.getElementById('imOutroBox').style.display = '';
-  }
+function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+
+function fmtDate(str) {
+  if (!str) return '___/___/______';
+  const d = new Date(str + 'T12:00:00');
+  return d.toLocaleDateString('pt-BR');
 }
 
-function preencherImovelPadrao(opt) {
-  const dados = {
-    imovel1: { end: 'Rua A, 100', cidade: 'São Paulo', estado: 'SP', desc: 'Apartamento 2 quartos' },
-    imovel2: { end: 'Rua B, 200', cidade: 'Rio de Janeiro', estado: 'RJ', desc: 'Casa com quintal' },
-    imovel3: { end: 'Av. C, 300', cidade: 'Belo Horizonte', estado: 'MG', desc: 'Comercial' }
-  };
-  if (dados[opt]) {
-    document.getElementById('im_end').value = dados[opt].end;
-    document.getElementById('im_cidade').value = dados[opt].cidade;
-    document.getElementById('im_est').value = dados[opt].estado;
-    document.getElementById('im_desc').value = dados[opt].desc;
-  }
+function calcTermino() {
+  const ini = v('ct_inicio'); const dur = v('ct_dur');
+  if (!ini || !dur) return '___/___/______';
+  const d = new Date(ini + 'T12:00:00');
+  d.setMonth(d.getMonth() + parseInt(dur));
+  return d.toLocaleDateString('pt-BR');
 }
 
-// Seleção de testemunhas
-function selecionarTipoTest(tipo) {
-  state.tipoTest = tipo;
-  document.querySelectorAll('#testPadraoBox, #testOutrasBox').forEach(el => el.style.display = 'none');
-  if (tipo === 'padrao') {
-    document.getElementById('testPadraoBox').style.display = '';
-  } else {
-    document.getElementById('testOutrasBox').style.display = '';
-  }
+function getTestemunhas() {
+  if (state.tipoTest === 'sem') return 'Sem testemunhas.';
+  if (state.tipoTest === 'padrao') return 'Testemunha 1: Marcos Kennedy de Sá e Souza | CPF: 715.963.721-68 | RG: 4217149 - DGPC\nTestemunha 2: GILMAR TOMAZ DE AQUINO | CPF: 521.723.921-20 | RG: 2086442 - SSP-GO';
+  const t1 = [v('t1_nome'), v('t1_cpf'), v('t1_rg')];
+  const t2 = [v('t2_nome'), v('t2_cpf'), v('t2_rg')];
+  return `Testemunha 1: ${t1[0]} | CPF: ${t1[1]} | RG: ${t1[2]}\nTestemunha 2: ${t2[0]} | CPF: ${t2[1]} | RG: ${t2[2]}`;
 }
 
-// Geração de texto do contrato (SEM chamada para API externa)
-function gerarTextoContrato() {
-  const locador = v('loca_nome') || 'Locador';
-  const locDocumento = v('loca_doc') || '---';
-  const imovelEnd = v('im_end') || 'Endereço não informado';
-  const imovelCidade = v('im_cidade') || 'Cidade';
-  const imovelEst = v('im_est') || 'UF';
-  const imovelDesc = v('im_desc') || 'Imóvel';
-  const aluguel = v('fin_aluguel') || '0';
-  const caucao = v('fin_caucao') || '100';
-  const locatario = v('loc_nome') || 'Locatário';
-  const locCpf = v('loc_cpf') || '---';
-  const locProf = v('loc_prof') || 'Profissão';
-  const locTel = v('loc_tel') || 'Telefone';
-  const test1 = state.tipoTest === 'padrao' ? 'Ana Silva - CPF: 555.666.777-88' : (v('test1_nome') || 'Testemunha 1') + ' - CPF: ' + (v('test1_cpf') || '---');
-  const test2 = state.tipoTest === 'padrao' ? 'Carlos Mendes - CPF: 999.888.777-66' : (v('test2_nome') || 'Testemunha 2') + ' - CPF: ' + (v('test2_cpf') || '---');
+function buildPrompt() {
+  return `Gere um contrato de locação residencial formal e completo em português brasileiro, juridicamente válido no Brasil. Use os dados abaixo. Formate os títulos das cláusulas em MAIÚSCULAS (ex: CLÁUSULA 1ª - DO OBJETO). Use apenas texto simples com quebras de linha, sem markdown.
 
-  const texto = `CONTRATO DE LOCAÇÃO DE IMÓVEL RESIDENCIAL
+LOCADOR:
+Nome: ${v('loc_nome')} | Nacionalidade: ${v('loc_nac')} | Estado Civil: ${v('loc_civil')}
+Profissão: ${v('loc_prof')} | RG: ${v('loc_rg')} | CPF: ${v('loc_cpf')}
+Celular: ${v('loc_cel')} | E-mail: ${v('loc_email')}
 
-CONTRATANTE:
-${locador}, portador(a) de CPF/CNPJ nº ${locDocumento}, doravante denominado(a) LOCADOR(A).
+LOCATÁRIO:
+Nome: ${v('loca_nome')} | Nacionalidade: ${v('loca_nac')} | Estado Civil: ${v('loca_civil')}
+Profissão: ${v('loca_prof')} | RG: ${v('loca_rg')} | CPF: ${v('loca_cpf')}
+Celular: ${v('loca_cel')} | E-mail: ${v('loca_email')}
 
-CONTRATADO:
-${locatario}, portador(a) de CPF nº ${locCpf}, profissão ${locProf}, doravante denominado(a) LOCATÁRIO(A).
+IMÓVEL:
+Endereço: ${v('im_end')} | Apartamento: ${v('im_apto')}
+Cartório: ${v('im_cart')} | Descrição: ${v('im_desc')}${v('im_uc') ? '\nUnidade Consumidora de Energia: ' + v('im_uc') : ''}
 
-DO OBJETO:
-É objeto deste contrato a locação do imóvel residencial situado em ${imovelEnd}, ${imovelCidade}, Estado de ${imovelEst}, descrito como: ${imovelDesc}.
-
-DO PRAZO:
-O prazo da locação é de 12 (doze) meses, a contar da data da assinatura deste contrato.
-
-DO VALOR:
-O valor do aluguel mensal é de R$ ${parseFloat(aluguel).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}, devido até o quinto dia útil de cada mês.
-
-DA CAUÇÃO:
-O(a) locatário(a) deposita como caução o equivalente a ${caucao}% do aluguel mensal, totalizando R$ ${(parseFloat(aluguel) * parseFloat(caucao) / 100).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}.
-
-CLÁUSULA 1 - DAS OBRIGAÇÕES DO LOCADOR:
-1.1 Manter o imóvel em condições de habitabilidade.
-1.2 Efetuar reparos que se fizerem necessários no imóvel, exceto aqueles de responsabilidade do locatário.
-1.3 Respeitar o direito de o locatário permanecer no imóvel durante o prazo da locação.
-
-CLÁUSULA 2 - DAS OBRIGAÇÕES DO LOCATÁRIO:
-2.1 Pagar pontualmente o aluguel nos vencimentos estipulados.
-2.2 Manter o imóvel em bom estado de conservação.
-2.3 Não efetuar alterações no imóvel sem prévia autorização do locador.
-2.4 Pagar as despesas relativas a água, luz, telefone e outras contas do imóvel.
-
-CLÁUSULA 3 - DA RESCISÃO:
-Este contrato poderá ser rescindido por qualquer das partes, mediante comunicação com antecedência de 30 (trinta) dias.
-
-CLÁUSULA 4 - DAS DISPOSIÇÕES FINAIS:
-As partes elegem o foro competente para dirimir as questões emergentes deste contrato.
-
-ASSINATURA DAS PARTES:
-
-Local e data: ______ / ______ / ______
-
-LOCADOR(A): ________________________________
-${locador}
-
-LOCATÁRIO(A): ________________________________
-${locatario}
+CONTRATO:
+Data de Início: ${fmtDate(v('ct_inicio'))} | Data de Término: ${calcTermino()} | Duração: ${v('ct_dur')} meses
+Valor do Aluguel: R$ ${v('ct_aluguel')} | Dia de Vencimento: dia ${v('ct_dia')}
+Forma de Pagamento do Aluguel: ${v('ct_pag_alug')}
+Valor do Caução: R$ ${v('ct_caucao')} | Forma de Pagamento do Caução: ${v('ct_pag_cau')}
+Índice de Reajuste: ${v('ct_indice')}${v('ct_indice_esp') ? ' ('+v('ct_indice_esp')+')' : ''}
+Data de Assinatura: ${fmtDate(v('ct_assin'))}
 
 TESTEMUNHAS:
+${getTestemunhas()}
 
-1ª Testemunha: ________________________________
-${test1}
+Inclua cláusulas sobre: objeto da locação, prazo, valor e pagamento, reajuste, caução, obrigações do locador, obrigações do locatário, conservação do imóvel, benfeitorias, rescisão, multas, disposições gerais, foro competente (Goiânia-GO), e ao final espaço para assinaturas com linhas tracejadas para: LOCADOR, LOCATÁRIO e TESTEMUNHAS.`;
+}
 
-2ª Testemunha: ________________________________
-${test2}`;
+async function callAPI() {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 120000);
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-api-key': 'sk-placeholder'
+      },
+      body: JSON.stringify({ 
+        model: 'claude-opus-4-20250514',
+        max_tokens: 4096,
+        messages: [{ role: 'user', content: buildPrompt() }]
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if (!res.ok) {
+      let errorMsg = 'Erro no servidor (' + res.status + ')';
+      try { const d = await res.json(); errorMsg = d.error || errorMsg; } catch(e) {}
+      throw new Error(errorMsg);
+    }
+    const data = await res.json();
+    if (!data.content || !data.content[0] || !data.content[0].text) throw new Error('Resposta vazia do servidor');
+    return data.content[0].text;
+  } catch(e) {
+    clearTimeout(timeoutId);
+    if (e.name === 'AbortError') throw new Error('Tempo limite excedido. Tente novamente.');
+    throw e;
+  }
+}
 
-  return texto;
+function setBusy(is, type) {
+  busy = is;
+  ['btnPrevia','btnWord','btnPdf'].forEach(id => document.getElementById(id).disabled = is);
+  const btnPrevia = document.getElementById('btnPrevia');
+  if (!is) {
+    btnPrevia.innerHTML = `<span class="eye-icon">👁️</span><span>PRÉVIA DO CONTRATO</span>${cachedText ? '<span class="badge-cached">✓ já gerado</span>' : ''}`;
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = msg; el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function hideError() { document.getElementById('errorBox').style.display = 'none'; }
+
+function showToast(msg, success = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show' + (success ? ' success' : '');
+  setTimeout(() => { t.className = 'toast'; }, 3000);
 }
 
 async function abrirPrevia() {
+  if (busy) return;
   hideError();
-  cachedText = gerarTextoContrato();
-  
-  document.getElementById('previewLocador').textContent = v('loca_nome') || '-';
-  document.getElementById('previewImovel').textContent = v('im_end') || '-';
-  document.getElementById('previewAluguel').textContent = (parseFloat(v('fin_aluguel')) || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2});
-  
-  const lines = cachedText.split('\n');
-  document.getElementById('modalBody').innerHTML = lines.map(line => {
-    const trimmed = line.trim();
-    if (!trimmed) return '<p class="contract-blank"></p>';
-    if (/^(CONTRATO|CONTRATANTE|CONTRATADO|DO OBJETO|DO PRAZO|DO VALOR|DA CAUÇÃO|CLÁUSULA|ASSINATURA|TESTEMUNHAS|LOCAL)/i.test(trimmed)) {
-      return `<p class="contract-clause">${trimmed}</p>`;
-    }
-    return `<p class="contract-line">${trimmed}</p>`;
+
+  if (cachedText) { renderModal(cachedText); return; }
+
+  setBusy(true);
+  const btn = document.getElementById('btnPrevia');
+  btn.innerHTML = '<div class="spin"></div><span>Gerando prévia...</span>';
+
+  try {
+    cachedText = await callAPI();
+    renderModal(cachedText);
+  } catch(e) { showError('Erro ao gerar prévia: ' + e.message); }
+
+  setBusy(false);
+}
+
+function renderModal(texto) {
+  const meta = document.getElementById('modalMeta');
+  const parts = [];
+  if (v('loc_nome')) parts.push(`📋 Locador: <b>${v('loc_nome')}</b>`);
+  if (v('loca_nome')) parts.push(`🏠 Locatário: <b>${v('loca_nome')}</b>`);
+  if (v('ct_aluguel')) parts.push(`💰 Aluguel: <b>R$ ${v('ct_aluguel')}</b>`);
+  if (v('ct_dur')) parts.push(`📅 Duração: <b>${v('ct_dur')} meses</b>`);
+  meta.innerHTML = parts.map(p => `<div class="meta-item">${p}</div>`).join('');
+
+  const body = document.getElementById('modalBody');
+  const isClause = (l) => /^(CLÁUSULA|CONTRATO DE|DO OBJETO|DO PRAZO|DO VALOR|DO REAJUSTE|DA CAUÇÃO|DAS OBRIGAÇÕES|DA RESCISÃO|DAS DISPOSIÇÕES|DO FORO|ASSINATURA|TESTEMUNHA|LOCADOR|LOCATÁRIO)/i.test(l);
+  body.innerHTML = texto.split('\n').map(raw => {
+    const line = raw.trim();
+    if (!line) return '<div class="contract-blank"></div>';
+    if (isClause(line)) return `<div class="contract-clause">${line}</div>`;
+    return `<div class="contract-line">${line}</div>`;
   }).join('');
-  
+
   document.getElementById('modalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
-  document.getElementById('cachedBadge').style.display = 'inline';
 }
 
 function fecharModal() {
@@ -469,46 +525,37 @@ function regerarContrato() {
 
 async function gerarDoc() {
   if (busy) return;
-  hideError(); 
-  setBusy(true, 'doc');
+  hideError(); setBusy(true, 'doc');
   const btn = document.getElementById('btnWord');
   const orig = btn.innerHTML;
   btn.innerHTML = '<div class="spin"></div><span>Gerando...</span>';
 
   try {
-    const texto = cachedText || gerarTextoContrato();
+    const texto = cachedText || await callAPI();
     if (!cachedText) cachedText = texto;
 
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;font-size:12pt;line-height:1.8;margin:2.5cm;color:#111;}p{text-align:justify;margin:3pt 0;}</style></head><body>${texto.split('\n').map(l => {const t = l.trim();if (!t) return '<p>&nbsp;</p>';if (/^(CLÁUSULA|CONTRATO DE|ASSINATURA|TESTEMUNHA|CONTRATANTE|CONTRATADO|DO OBJETO|DO PRAZO|DO VALOR|DA CAUÇÃO)/i.test(t)) return `<p><b>${t}</b></p>`;return `<p>${t}</p>`;}).join('\n')}</body></html>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;font-size:12pt;line-height:1.8;margin:2.5cm;color:#111;}p{text-align:justify;margin:3pt 0;}</style></head><body>${texto.split('\n').map(l => {const t = l.trim();if (!t) return '<p>&nbsp;</p>';if (/^(CLÁUSULA|CONTRATO DE|ASSINATURA|TESTEMUNHA)/i.test(t)) return `<p><b>${t}</b></p>`;return `<p>${t}</p>`;}).join('\n')}</body></html>`;
 
     const blob = new Blob([html], { type: 'application/msword' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `Contrato_${(v('loca_nome')||'Locatario').replace(/\s+/g,'_')}.doc`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    a.href = url; a.download = `Contrato_${(v('loca_nome')||'Locatario').replace(/\s+/g,'_')}.doc`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     showToast('Word gerado com sucesso!', true);
-  } catch(e) {
-    showError('Erro ao gerar Word: ' + e.message);
-  }
+  } catch(e) { showError('Erro ao gerar Word: ' + e.message); }
 
-  btn.innerHTML = orig;
-  setBusy(false);
+  btn.innerHTML = orig; setBusy(false);
 }
 
 async function gerarPDF() {
   if (busy) return;
-  hideError();
-  setBusy(true, 'pdf');
+  hideError(); setBusy(true, 'pdf');
   const btn = document.getElementById('btnPdf');
   const orig = btn.innerHTML;
   btn.innerHTML = '<div class="spin"></div><span>Gerando...</span>';
 
   try {
-    const texto = cachedText || gerarTextoContrato();
+    const texto = cachedText || await callAPI();
     if (!cachedText) cachedText = texto;
 
     const tempDiv = document.createElement('div');
@@ -523,7 +570,7 @@ async function gerarPDF() {
     tempDiv.style.lineHeight = '1.6';
     tempDiv.style.color = '#333';
     
-    const isClause = (l) => /^(CLÁUSULA|CONTRATO DE|DO OBJETO|DO PRAZO|DO VALOR|DO REAJUSTE|DA CAUÇÃO|DAS OBRIGAÇÕES|DA RESCISÃO|DAS DISPOSIÇÕES|DO FORO|ASSINATURA|TESTEMUNHA|LOCADOR|LOCATÁRIO|CONTRATANTE|CONTRATADO)/i.test(l);
+    const isClause = (l) => /^(CLÁUSULA|CONTRATO DE|DO OBJETO|DO PRAZO|DO VALOR|DO REAJUSTE|DA CAUÇÃO|DAS OBRIGAÇÕES|DA RESCISÃO|DAS DISPOSIÇÕES|DO FORO|ASSINATURA|TESTEMUNHA|LOCADOR|LOCATÁRIO)/i.test(l);
     
     const html = texto.split('\n').map(raw => {
       const line = raw.trim();
@@ -547,12 +594,11 @@ async function gerarPDF() {
     
     document.body.removeChild(tempDiv);
     showToast('PDF gerado com sucesso!', true);
-  } catch(e) {
-    showError('Erro ao gerar PDF: ' + e.message);
+  } catch(e) { 
+    showError('Erro ao gerar PDF: ' + e.message); 
   }
 
-  btn.innerHTML = orig;
-  setBusy(false);
+  btn.innerHTML = orig; setBusy(false);
 }
 
 function limpar() {
@@ -564,9 +610,7 @@ function limpar() {
   document.querySelectorAll('.pills').forEach(g => {
     g.querySelectorAll('.pill').forEach((p,i) => p.classList.toggle('active', i === 0));
   });
-  state.tipoLocador = 'padrao';
-  state.tipoImovel = 'imovel1';
-  state.tipoTest = 'padrao';
+  state.tipoLocador = 'padrao'; state.tipoImovel = 'imovel1'; state.tipoTest = 'padrao';
   document.getElementById('locadorPadraoSelect').style.display = '';
   document.getElementById('testPadraoBox').style.display = '';
   document.getElementById('testOutrasBox').style.display = 'none';
