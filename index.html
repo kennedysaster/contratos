@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contrato de Locação Residencial</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -551,44 +551,76 @@ async function gerarPDF() {
     const texto = cachedText || await callAPI();
     if (!cachedText) cachedText = texto;
 
-    const tempDiv = document.createElement('div');
-    tempDiv.style.position = 'absolute';
-    tempDiv.style.left = '-9999px';
-    tempDiv.style.top = '-9999px';
-    tempDiv.style.width = '800px';
-    tempDiv.style.backgroundColor = 'white';
-    tempDiv.style.padding = '40px';
-    tempDiv.style.fontFamily = 'Arial, sans-serif';
-    tempDiv.style.fontSize = '11pt';
-    tempDiv.style.lineHeight = '1.6';
-    tempDiv.style.color = '#333';
+    // Importar jsPDF
+    const { jsPDF } = window.jspdf;
     
+    if (!jsPDF) {
+      throw new Error('Biblioteca jsPDF não foi carregada. Recarregue a página.');
+    }
+
+    // Criar documento PDF
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const margin = 15;
+    const lineHeight = 5;
+    let yPosition = margin;
+    let pageNumber = 1;
+
+    // Configurar fontes
+    pdf.setFont('Helvetica');
+    pdf.setFontSize(11);
+
+    // Processar linhas de texto
+    const linhas = texto.split('\n');
     const isClause = (l) => /^(CLÁUSULA|CONTRATO DE|DO OBJETO|DO PRAZO|DO VALOR|DO REAJUSTE|DA CAUÇÃO|DAS OBRIGAÇÕES|DA RESCISÃO|DAS DISPOSIÇÕES|DO FORO|ASSINATURA|TESTEMUNHA|LOCADOR|LOCATÁRIO)/i.test(l);
-    
-    const html = texto.split('\n').map(raw => {
-      const line = raw.trim();
-      if (!line) return '<p style="height: 10px;"></p>';
-      if (isClause(line)) return `<h3 style="margin: 20px 0 10px; color: #0f2447; font-size: 13pt; border-bottom: 1px solid #ccc; padding-bottom: 5px;">${line}</h3>`;
-      return `<p style="margin: 5px 0; text-align: justify;">${line}</p>`;
-    }).join('');
-    
-    tempDiv.innerHTML = html;
-    document.body.appendChild(tempDiv);
 
-    const opt = {
-      margin: 10,
-      filename: `Contrato_${(v('loca_nome')||'Locatario').replace(/\s+/g,'_')}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, allowTaint: true, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
+    for (let i = 0; i < linhas.length; i++) {
+      const line = linhas[i].trim();
+      
+      // Pular linha vazia
+      if (!line) {
+        yPosition += 3;
+        continue;
+      }
 
-    await html2pdf().set(opt).from(tempDiv).save();
+      // Verificar se é cláusula
+      if (isClause(line)) {
+        pdf.setFont('Helvetica', 'bold');
+        pdf.setFontSize(11);
+      } else {
+        pdf.setFont('Helvetica', 'normal');
+        pdf.setFontSize(11);
+      }
+
+      // Quebrar texto longo em múltiplas linhas
+      const wrappedText = pdf.splitTextToSize(line, pageWidth - (2 * margin));
+      
+      // Verificar se precisa de nova página
+      if (yPosition + (wrappedText.length * lineHeight) > pageHeight - margin) {
+        pdf.addPage();
+        yPosition = margin;
+        pageNumber++;
+      }
+
+      // Escrever texto no PDF
+      pdf.text(wrappedText, margin, yPosition);
+      yPosition += wrappedText.length * lineHeight;
+    }
+
+    // Salvar PDF
+    const fileName = `Contrato_${(v('loca_nome')||'Locatario').replace(/\s+/g,'_')}.pdf`;
+    pdf.save(fileName);
     
-    document.body.removeChild(tempDiv);
-    showToast('PDF gerado com sucesso!', true);
+    showToast('✅ PDF gerado com sucesso!', true);
   } catch(e) { 
-    showError('Erro ao gerar PDF: ' + e.message); 
+    console.error('Erro ao gerar PDF:', e);
+    showError('❌ Erro ao gerar PDF: ' + (e.message || 'Erro desconhecido')); 
   }
 
   btn.innerHTML = orig; setBusy(false);
