@@ -411,30 +411,156 @@ ${getTestemunhas()}
 Inclua cláusulas sobre: objeto da locação, prazo, valor e pagamento, reajuste, caução, obrigações do locador, obrigações do locatário, conservação do imóvel, benfeitorias, rescisão, multas, disposições gerais, foro competente (Goiânia-GO), e ao final espaço para assinaturas com linhas tracejadas para: LOCADOR, LOCATÁRIO e TESTEMUNHAS.`;
 }
 
+function gerarContratoLocal() {
+  const getTestemunhas = () => {
+    const t1 = document.getElementById('test1Nome')?.value || 'TESTEMUNHA 1';
+    const t2 = document.getElementById('test2Nome')?.value || 'TESTEMUNHA 2';
+    return `1ª Testemunha: ${t1}\n2ª Testemunha: ${t2}`;
+  };
+
+  const calcTermino = () => {
+    const inicio = new Date(v('ct_inicio'));
+    const duracao = parseInt(v('ct_dur')) || 12;
+    const termino = new Date(inicio.getFullYear(), inicio.getMonth() + duracao, inicio.getDate());
+    return termino.toLocaleDateString('pt-BR');
+  };
+
+  const fmtDate = (dateStr) => {
+    if (!dateStr) return 'Data não informada';
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('pt-BR');
+  };
+
+  const v = (id) => {
+    const el = document.getElementById(id);
+    return el ? el.value : '';
+  };
+
+  const locador = v('loc_nome') || 'LOCADOR';
+  const locatario = v('loca_nome') || 'LOCATÁRIO';
+  const endereco = v('im_end') || 'Endereço não informado';
+  const apto = v('im_apto') || '';
+  const aluguel = v('ct_aluguel') || '0,00';
+  const caucao = v('ct_caucao') || '0,00';
+  const inicio = fmtDate(v('ct_inicio'));
+  const termino = calcTermino();
+  const duracao = v('ct_dur') || '12';
+  const dia = v('ct_dia') || '1º';
+  const assinatura = fmtDate(v('ct_assin'));
+
+  return `CONTRATO DE LOCAÇÃO DE IMÓVEL RESIDENCIAL
+
+Este contrato de locação celebrado em ${assinatura}, entre ${locador}, LOCADOR, e ${locatario}, LOCATÁRIO, sob as cláusulas e condições seguintes:
+
+CLÁUSULA 1ª - DO OBJETO
+
+O LOCADOR aluga ao LOCATÁRIO o imóvel situado no endereço: ${endereco}${apto ? ', Apto. ' + apto : ''}, neste município de Goiânia, estado de Goiás, para fins estritamente residenciais, sob as condições constantes neste contrato.
+
+CLÁUSULA 2ª - DO PRAZO
+
+O prazo desta locação é de ${duracao} (${['um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove', 'dez', 'onze', 'doze'][parseInt(duracao)-1] || duracao}) meses, tendo início em ${inicio} e término em ${termino}, prorrogável por acordo entre as partes.
+
+CLÁUSULA 3ª - DO VALOR E FORMA DE PAGAMENTO
+
+O valor do aluguel é de R$ ${aluguel} (${converteNumeroTexto(aluguel)}) mensais, pagável até o dia ${dia} de cada mês, por meio de ${v('ct_pag_alug') || 'transferência bancária'}.
+
+CLÁUSULA 4ª - DA CAUÇÃO
+
+O LOCATÁRIO depositará ao LOCADOR a quantia de R$ ${caucao} (${converteNumeroTexto(caucao)}) como caução, garantindo o cumprimento de suas obrigações contratuais, a ser recebida por ${v('ct_pag_cau') || 'depósito em conta'}.
+
+CLÁUSULA 5ª - DO REAJUSTE
+
+O aluguel será reajustado anualmente de acordo com o ${v('ct_indice') || 'INPC/IBGE'}${v('ct_indice_esp') ? ', ' + v('ct_indice_esp') : ''}, conforme legislação vigente no Brasil.
+
+CLÁUSULA 6ª - DAS OBRIGAÇÕES DO LOCADOR
+
+O LOCADOR se obriga a:
+a) Entregar o imóvel em perfeito estado de conservação;
+b) Efetuar reparos que se tornarem necessários durante a locação;
+c) Prestar as informações solicitadas sobre o imóvel;
+d) Manter a segurança da edificação.
+
+CLÁUSULA 7ª - DAS OBRIGAÇÕES DO LOCATÁRIO
+
+O LOCATÁRIO se obriga a:
+a) Pagar pontualmente os aluguéis e demais encargos;
+b) Conservar o imóvel em perfeito estado de limpeza e higiene;
+c) Não efetuar alterações estruturais no imóvel;
+d) Permitir vistoria do imóvel pelo LOCADOR;
+e) Devolver o imóvel nas mesmas condições em que o recebeu.
+
+CLÁUSULA 8ª - DA CONSERVAÇÃO DO IMÓVEL
+
+O LOCATÁRIO é responsável pela conservação e limpeza do imóvel, respondendo por danos causados por sua negligência, exceto aqueles decorrentes do uso normal.
+
+CLÁUSULA 9ª - DE BENFEITORIAS
+
+Qualquer benfeitoria realizada no imóvel sem prévia autorização por escrito do LOCADOR será de propriedade exclusiva deste, sem direito a indenização pelo LOCATÁRIO.
+
+CLÁUSULA 10ª - DA RESCISÃO
+
+O contrato poderá ser rescindido por:
+a) Término natural do prazo;
+b) Vontade das partes;
+c) Inadimplência de qualquer das partes;
+d) Desapropriação do imóvel.
+
+CLÁUSULA 11ª - DE MULTAS E PENALIDADES
+
+O LOCATÁRIO fica sujeito a multa de 10% (dez por cento) sobre o valor do aluguel em caso de atraso no pagamento superior a 3 (três) dias, além de juros de 1% (um por cento) ao mês.
+
+CLÁUSULA 12ª - DAS DISPOSIÇÕES GERAIS
+
+a) O LOCATÁRIO assume integralmente as despesas com água, energia elétrica, gás, telefone e internet;
+b) É proibido sublocar ou ceder o imóvel sem consentimento por escrito do LOCADOR;
+c) É proibido manter animais domésticos no imóvel sem autorização prévia;
+d) Qualquer modificação no contrato deve ser feita por escrito, assinada pelas partes.
+
+CLÁUSULA 13ª - DO FORO
+
+Fica eleito o foro de Goiânia, estado de Goiás, para dirimir quaisquer questões decorrentes deste contrato.
+
+CLÁUSULA 14ª - DISPOSIÇÕES FINAIS
+
+As partes aceitam os termos e condições deste contrato, sob as penas da lei, firmando este instrumento como prova de suas vontades e compromissos mútuos.
+
+DATA DE ASSINATURA: ${assinatura}
+
+
+ASSINATURA DO LOCADOR
+
+_________________________________________
+${locador}
+CPF: ${v('loc_cpf') || '_______________________'}
+
+
+ASSINATURA DO LOCATÁRIO
+
+_________________________________________
+${locatario}
+CPF: ${v('loca_cpf') || '_______________________'}
+
+
+TESTEMUNHAS
+
+_________________________________________
+${v('test1Nome') || 'TESTEMUNHA 1'}
+CPF: ${v('test1Cpf') || '_______________________'}
+
+
+_________________________________________
+${v('test2Nome') || 'TESTEMUNHA 2'}
+CPF: ${v('test2Cpf') || '_______________________'}`;
+}
+
+function converteNumeroTexto(valor) {
+  const num = parseFloat(valor.replace(',', '.'));
+  if (isNaN(num)) return 'valor não definido';
+  return 'reais';
+}
+
 async function callAPI() {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 120000);
-  try {
-    const res = await fetch('/.netlify/functions/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: buildPrompt() }),
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
-    if (!res.ok) {
-      let errorMsg = 'Erro no servidor (' + res.status + ')';
-      try { const d = await res.json(); errorMsg = d.error || errorMsg; } catch(e) {}
-      throw new Error(errorMsg);
-    }
-    const data = await res.json();
-    if (!data.text || !data.text.trim()) throw new Error('Resposta vazia do servidor');
-    return data.text;
-  } catch(e) {
-    clearTimeout(timeoutId);
-    if (e.name === 'AbortError') throw new Error('Tempo limite excedido. Tente novamente.');
-    throw e;
-  }
+  return gerarContratoLocal();
 }
 
 function setBusy(is, type) {
@@ -542,23 +668,24 @@ async function gerarDoc() {
 
 async function gerarPDF() {
   if (busy) return;
-  hideError(); setBusy(true, 'pdf');
+  hideError(); 
+  setBusy(true, 'pdf');
   const btn = document.getElementById('btnPdf');
   const orig = btn.innerHTML;
   btn.innerHTML = '<div class="spin"></div><span>Gerando...</span>';
 
   try {
-    const texto = cachedText || await callAPI();
-    if (!cachedText) cachedText = texto;
-
-    // Importar jsPDF
     const { jsPDF } = window.jspdf;
     
     if (!jsPDF) {
       throw new Error('Biblioteca jsPDF não foi carregada. Recarregue a página.');
     }
 
-    // Criar documento PDF
+    // Gerar texto do contrato (sem await, é síncrono)
+    const texto = cachedText || gerarContratoLocal();
+    if (!cachedText) cachedText = texto;
+
+    // Criar PDF com jsPDF
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -568,62 +695,58 @@ async function gerarPDF() {
     const pageHeight = pdf.internal.pageSize.getHeight();
     const pageWidth = pdf.internal.pageSize.getWidth();
     const margin = 15;
-    const lineHeight = 5;
+    const lineHeight = 5.5;
     let yPosition = margin;
-    let pageNumber = 1;
 
-    // Configurar fontes
     pdf.setFont('Helvetica');
     pdf.setFontSize(11);
 
-    // Processar linhas de texto
     const linhas = texto.split('\n');
-    const isClause = (l) => /^(CLÁUSULA|CONTRATO DE|DO OBJETO|DO PRAZO|DO VALOR|DO REAJUSTE|DA CAUÇÃO|DAS OBRIGAÇÕES|DA RESCISÃO|DAS DISPOSIÇÕES|DO FORO|ASSINATURA|TESTEMUNHA|LOCADOR|LOCATÁRIO)/i.test(l);
+    const isClause = (l) => /^(CLÁUSULA|CONTRATO|ASSINATURA|TESTEMUNHA|LOCADOR|LOCATÁRIO|DATA)/i.test(l);
 
     for (let i = 0; i < linhas.length; i++) {
       const line = linhas[i].trim();
       
-      // Pular linha vazia
       if (!line) {
-        yPosition += 3;
+        yPosition += 2;
+        if (yPosition > pageHeight - margin) {
+          pdf.addPage();
+          yPosition = margin;
+        }
         continue;
       }
 
-      // Verificar se é cláusula
       if (isClause(line)) {
         pdf.setFont('Helvetica', 'bold');
         pdf.setFontSize(11);
       } else {
         pdf.setFont('Helvetica', 'normal');
-        pdf.setFontSize(11);
+        pdf.setFontSize(10);
       }
 
-      // Quebrar texto longo em múltiplas linhas
       const wrappedText = pdf.splitTextToSize(line, pageWidth - (2 * margin));
-      
-      // Verificar se precisa de nova página
-      if (yPosition + (wrappedText.length * lineHeight) > pageHeight - margin) {
+      const textHeight = wrappedText.length * lineHeight;
+
+      if (yPosition + textHeight > pageHeight - margin) {
         pdf.addPage();
         yPosition = margin;
-        pageNumber++;
       }
 
-      // Escrever texto no PDF
       pdf.text(wrappedText, margin, yPosition);
-      yPosition += wrappedText.length * lineHeight;
+      yPosition += textHeight;
     }
 
-    // Salvar PDF
-    const fileName = `Contrato_${(v('loca_nome')||'Locatario').replace(/\s+/g,'_')}.pdf`;
+    const fileName = `Contrato_${(document.getElementById('loca_nome')?.value || 'Locatario').replace(/\s+/g,'_')}.pdf`;
     pdf.save(fileName);
     
     showToast('✅ PDF gerado com sucesso!', true);
   } catch(e) { 
-    console.error('Erro ao gerar PDF:', e);
+    console.error('Erro:', e);
     showError('❌ Erro ao gerar PDF: ' + (e.message || 'Erro desconhecido')); 
   }
 
-  btn.innerHTML = orig; setBusy(false);
+  btn.innerHTML = orig; 
+  setBusy(false);
 }
 
 function limpar() {
